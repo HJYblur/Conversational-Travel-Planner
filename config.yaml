@@ -1,0 +1,4 @@
+settings:
+  data_path: "./data"
+  user_path: "./data/sofia"
+  k: 3

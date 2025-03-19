@@ -1,0 +1,57 @@
+import yaml
+import os
+import json
+import tkinter as tk
+import pandas as pd
+from gui import ConversationalAgentGUI
+
+_config = None
+
+def load_config():
+    global _config
+    if _config is None:
+        with open('config.yaml', 'r') as stream:
+            try:
+                _config = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+                _config = None
+    return _config
+    
+    
+def init():
+    # Initialize the user information
+    user = input('Please enter your name: ')
+    
+    # Initialize configuration
+    config = load_config()
+    
+    # Initialize the data directory
+    root_path = config['settings']['data_path']
+    user_path = os.path.join(root_path, user)
+    config['settings']['user_path'] = user_path
+    os.makedirs(user_path, exist_ok=True)
+    
+    # # Initialize the GUI
+    # root = tk.Tk()
+    # gui = ConversationalAgentGUI(root)
+    # root.mainloop()
+    # user = gui.send_message()
+    
+
+def load_json(file_path):
+    '''
+    Load a JSON file from the given file path and return a list
+    '''
+    with open(os.path.join(_config['settings']['user_path'], file_path), 'r') as file:
+        data = json.load(file)
+    return list(data.values())
+
+
+
+def save_json(data, file_path):
+    '''
+    Save a JSON file to the given file path
+    '''
+    with open(os.path.join(_config['settings']['user_path'], file_path), 'w') as file:
+        json.dump(data, file, indent=4)

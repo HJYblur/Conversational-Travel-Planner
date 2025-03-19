@@ -1,0 +1,20 @@
+{
+    "name": "Sofia",
+    "age": "24",
+    "occupation": "student",
+    "loves_to_travel": "true",
+    "job_status": "no job",
+    "travel_companion": "boyfriend",
+    "top_travel_1_destination": "USA",
+    "top_travel_1_type": "road trip",
+    "top_travel_2_destination": "South Africa",
+    "top_travel_2_type": "visited friend",
+    "top_travel_3_destination": "Paris",
+    "top_travel_3_type": "Olympics",
+    "travel_preferences_likes_nature": "true",
+    "travel_preferences_usual_transport": "plane",
+    "travel_preferences_nauseous_in_1": "cars",
+    "travel_preferences_nauseous_in_2": "sometimes trains",
+    "travel_preferences_relaxation_preference": "beach with a good book",
+    "travel_preferences_food_preference": "good authentic food"
+}

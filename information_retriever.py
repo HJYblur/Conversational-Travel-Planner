@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModel
 from utils import *
 
 
-def init_model():
+def init_retrieve_model():
     tokenizer = AutoTokenizer.from_pretrained('facebook/contriever')
     model = AutoModel.from_pretrained('facebook/contriever').to("cpu")
     return model, tokenizer
@@ -56,20 +56,16 @@ def faiss_search(memory, query, k = 3):
     return indices[0]
 
 
-if __name__ == "__main__":
-    model, tokenizer = init_model()
+def retrieve(model, tokenizer, query_text, memory_type):
     config = load_config()
     
-    # TODO: Query is hard coded here, later it will receive input from context aware
-    query_text = 'I want to go to the beach'
     query = embed_text(query_text, model, tokenizer) 
-    
-    # For test, we only extract the user preference from the long-term memory
-    preference_text = load_json('preference.json')
-    preference = embed_texts(preference_text, model, tokenizer)
+    memory_text = load_json('preference.json') if memory_type == 'preference' else load_event_json('event.json')
+    memory = embed_texts(memory_text, model, tokenizer)
     
     # Search k nearest memory (kNN search)
     k = config['settings']['k']
-    indices = faiss_search(preference, query, k)
-    output = [preference_text[indices[i]] for i in range(k)]
-    print(f"Query: {query_text}, Output: {output}")
+    indices = faiss_search(memory, query, k)
+    output = [memory_text[indices[i]] for i in range(k)]
+    print(f"Query: {query_text}, Memory type: {memory_type}, Output: {output}")
+    return output

@@ -2,8 +2,9 @@ import yaml
 import os
 import json
 import tkinter as tk
-import pandas as pd
 from gui import ConversationalAgentGUI
+
+from event import Event
 
 _config = None
 
@@ -19,7 +20,7 @@ def load_config():
     return _config
     
     
-def init():
+def user_init():
     # Initialize the user information
     user = input('Please enter your name: ')
     
@@ -47,6 +48,16 @@ def load_json(file_path):
         data = json.load(file)
     return list(data.values())
 
+
+def load_event_json(file_path = "event.json"):
+    '''
+    Load a JSON file which is a list
+    '''
+    with open(os.path.join(_config['settings']['user_path'], file_path), 'r') as file:
+        events_data = json.load(file)
+
+    # Convert JSON data to Event instances
+    return [Event.from_dict(event).extract() for event in events_data]
 
 
 def save_json(data, file_path):

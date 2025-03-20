@@ -19,6 +19,5 @@ plotly
 eyed3
 feat
 pyyaml
-tkinter
 faiss-cpu
 torch

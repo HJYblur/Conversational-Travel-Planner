@@ -21,4 +21,5 @@ feat
 pyyaml
 faiss-cpu
 torch
+requests
 pygame

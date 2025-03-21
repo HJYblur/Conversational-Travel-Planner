@@ -2,7 +2,7 @@ import yaml
 import os
 import json
 import tkinter as tk
-from gui import ConversationalAgentGUI
+from gui import AudioPlayerApp
 
 from event import Event
 
@@ -33,12 +33,11 @@ def user_init():
     config['settings']['user_path'] = user_path
     os.makedirs(user_path, exist_ok=True)
     
-    # # Initialize the GUI
-    # root = tk.Tk()
-    # gui = ConversationalAgentGUI(root)
-    # root.mainloop()
-    # user = gui.send_message()
-    
+def GUI_init():
+    # Initialize the GUI
+    root = tk.Tk()
+    app = AudioPlayerApp(root)
+    root.mainloop()
 
 def load_json(file_path):
     '''

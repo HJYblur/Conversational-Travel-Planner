@@ -6,6 +6,7 @@ def main():
     # Step1: System initialization
     print('Hello, welcome to the travel recommendation agent!')
     user_init()
+    GUI_init()
     
     # Step2-6 should be in a for loop
     # Step2: Recode the user speech and convert it to text (livekit)

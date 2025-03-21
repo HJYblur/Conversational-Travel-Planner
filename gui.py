@@ -3,66 +3,38 @@ from tkinter import scrolledtext
 from tkinter import filedialog
 import pygame
 
-class ConversationalAgentGUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Conversational Travel Planner")
-
-        self.chat_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, state='disabled', width=50, height=15)
-        self.chat_area.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
-
-        self.user_input = tk.Entry(root, width=40)
-        self.user_input.grid(row=1, column=0, padx=10, pady=10)
-
-        self.send_button = tk.Button(root, text="Send", command=self.send_message)
-        self.send_button.grid(row=1, column=1, padx=10, pady=10)
-
-    def send_message(self):
-        user_message = self.user_input.get()
-        if user_message.strip():
-            self.chat_area.config(state='normal')
-            self.chat_area.insert(tk.END, "User: " + user_message + "\n")
-            self.chat_area.config(state='disabled')
-            self.user_input.delete(0, tk.END)
-            self.respond(user_message)
-        return user_message
-
-
-    def respond(self, user_message):
-        if user_message:
-            agent_response = user_message
-        else:
-            agent_response = "Agent: I am here to help you."
-        self.chat_area.config(state='normal')
-        self.chat_area.insert(tk.END, agent_response + "\n")
-        self.chat_area.config(state='disabled')
-        
-
 
 class AudioPlayerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Conversational Travel Planner")
 
-        self.chat_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, state='disabled', width=50, height=15)
+        # Create a frame for the chat area and user input
+        chat_frame = tk.Frame(root)
+        chat_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.chat_area = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state='disabled', width=50, height=15)
         self.chat_area.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
 
-        self.user_input = tk.Entry(root, width=40)
+        self.user_input = tk.Entry(chat_frame, width=40)
         self.user_input.grid(row=1, column=0, padx=10, pady=10)
 
-        self.send_button = tk.Button(root, text="Send", command=self.send_message)
+        self.send_button = tk.Button(chat_frame, text="Send", command=self.send_message)
         self.send_button.grid(row=1, column=1, padx=10, pady=10)
-        
-        # Create buttons for opening, playing, pausing, and resuming audio files
-        self.open_button = tk.Button(root, text="Open Audio File", command=self.open_audio)
-        self.play_button = tk.Button(root, text="Play", state=tk.DISABLED, command=self.play_audio)
-        self.pause_button = tk.Button(root, text="Pause", state=tk.DISABLED, command=self.pause_audio)
-        self.resume_button = tk.Button(root, text="Resume", state=tk.DISABLED, command=self.resume_audio)
 
-        self.open_button.pack(pady=10)
-        self.play_button.pack()
-        self.pause_button.pack()
-        self.resume_button.pack()
+        # Create a frame for the audio controls
+        audio_frame = tk.Frame(root)
+        audio_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.open_button = tk.Button(audio_frame, text="Open Audio File", command=self.open_audio)
+        self.play_button = tk.Button(audio_frame, text="Play", state=tk.DISABLED, command=self.play_audio)
+        self.pause_button = tk.Button(audio_frame, text="Pause", state=tk.DISABLED, command=self.pause_audio)
+        self.resume_button = tk.Button(audio_frame, text="Resume", state=tk.DISABLED, command=self.resume_audio)
+
+        self.open_button.grid(row=0, column=0, padx=5, pady=5)
+        self.play_button.grid(row=0, column=1, padx=5, pady=5)
+        self.pause_button.grid(row=0, column=2, padx=5, pady=5)
+        self.resume_button.grid(row=0, column=3, padx=5, pady=5)
 
         # Initialize pygame
         pygame.mixer.init()
@@ -103,8 +75,7 @@ class AudioPlayerApp:
             # Stop audio playback before closing the application
             pygame.mixer.music.stop()
         self.root.destroy()
-        
-        
+
     def send_message(self):
         user_message = self.user_input.get()
         if user_message.strip():
@@ -114,7 +85,6 @@ class AudioPlayerApp:
             self.user_input.delete(0, tk.END)
             self.respond(user_message)
         return user_message
-
 
     def respond(self, user_message):
         if user_message:

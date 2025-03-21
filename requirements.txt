@@ -21,3 +21,4 @@ feat
 pyyaml
 faiss-cpu
 torch
+pygame

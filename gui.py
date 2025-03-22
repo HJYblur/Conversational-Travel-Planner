@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, filedialog
+from tkinter import scrolledtext, simpledialog
 import os
 import sounddevice as sd
 import wavio
@@ -12,6 +12,7 @@ class AudioPlayerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Conversational Travel Planner")
+        self.center_window()
         self.config = load_config()
 
         self.planner_name_label = tk.Label(root, text="Alice", font=("Helvetica", 32))
@@ -41,8 +42,30 @@ class AudioPlayerApp:
         # Initialize GUI display
         self.start()
 
+
+    def center_window(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width() * 2
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+        
+            
     def start(self):
-        self.display("Hello, welcome to the travel recommendation agent!\n", False)
+        user = simpledialog.askstring("User Initialization", "Please enter your name:")
+        
+        if user:
+            # Initialize the data directory
+            root_path = self.config['settings']['data_path']
+            user_path = os.path.join(root_path, user)
+            self.config['settings']['user_path'] = user_path
+            os.makedirs(user_path, exist_ok=True)
+            
+            self.display(f"Hello {user}, welcome to the travel recommendation agent!\n")
+        else:
+            # If the user cancels the input dialog, close the application
+            self.root.destroy()
 
     def start_recording(self):
         if not self.recording:

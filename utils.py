@@ -9,16 +9,6 @@ from configure_loader import load_config
 import threading
 config = load_config()
     
-def user_init():
-    # Initialize the user information
-    user = input('Please enter your name: ')
-    
-    # Initialize the data directory
-    root_path = config['settings']['data_path']
-    user_path = os.path.join(root_path, user)
-    config['settings']['user_path'] = user_path
-    os.makedirs(user_path, exist_ok=True)
-    
     
 def record_init():
     device_info = sd.query_devices(kind='input')

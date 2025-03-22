@@ -4,7 +4,6 @@ from information_retriever import *
 
 def main():
     # Step1: System initialization
-    user_init()
     record_init()
     GUI_init()
     

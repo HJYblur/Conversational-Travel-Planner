@@ -1,6 +1,8 @@
+recording:
+  channels: 1
+  device_index: 3
+  samplerate: 48000
 settings:
-  data_path: "./data"
-  user_path: "./data/sofia"
+  data_path: ./data
   k: 3
-  freq: 48000
-  duration: 10 # max time for recoding the audio: 10s
+  user_path: ./data/sofia

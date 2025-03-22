@@ -4,8 +4,8 @@ from information_retriever import *
 
 def main():
     # Step1: System initialization
-    print('Hello, welcome to the travel recommendation agent!')
     user_init()
+    record_init()
     GUI_init()
     
     # Step2-6 should be in a for loop

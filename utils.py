@@ -2,9 +2,11 @@ import yaml
 import os
 import json
 import tkinter as tk
+import sounddevice as sd
 from gui import AudioPlayerApp
 from event import Event
 from configure_loader import load_config
+import threading
 config = load_config()
     
 def user_init():
@@ -17,11 +19,31 @@ def user_init():
     config['settings']['user_path'] = user_path
     os.makedirs(user_path, exist_ok=True)
     
+    
+def record_init():
+    device_info = sd.query_devices(kind='input')
+    default_device = device_info['index']
+    channels = device_info['max_input_channels']
+    sample_rate = int(device_info['default_samplerate'])  # Get the device's default sample rate
+
+    # Save the recording settings to the config
+    config['recording'] = {
+        'device_index': default_device,
+        'channels': channels,
+        'samplerate': sample_rate
+    }
+
+    # Save the updated config to the config.yaml file
+    with open('config.yaml', 'w') as config_file:
+        yaml.dump(config, config_file)
+
+    
 def GUI_init():
     # Initialize the GUI
     root = tk.Tk()
     app = AudioPlayerApp(root)
     root.mainloop()
+    
 
 def load_json(file_path):
     '''

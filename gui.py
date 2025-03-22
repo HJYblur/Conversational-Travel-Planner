@@ -1,13 +1,18 @@
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import filedialog
+import os
 import pygame
+import record
+from scipy.io.wavfile import write
+from configure_loader import load_config
 
 
 class AudioPlayerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Conversational Travel Planner")
+        self.config = load_config()
 
         # Create a frame for the chat area and user input
         chat_frame = tk.Frame(root)
@@ -26,15 +31,13 @@ class AudioPlayerApp:
         audio_frame = tk.Frame(root)
         audio_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
+        self.record_button = tk.Button(audio_frame, text = "Record user input", command=self.record_audio)
         self.open_button = tk.Button(audio_frame, text="Open Audio File", command=self.open_audio)
         self.play_button = tk.Button(audio_frame, text="Play", state=tk.DISABLED, command=self.play_audio)
-        self.pause_button = tk.Button(audio_frame, text="Pause", state=tk.DISABLED, command=self.pause_audio)
-        self.resume_button = tk.Button(audio_frame, text="Resume", state=tk.DISABLED, command=self.resume_audio)
-
-        self.open_button.grid(row=0, column=0, padx=5, pady=5)
-        self.play_button.grid(row=0, column=1, padx=5, pady=5)
-        self.pause_button.grid(row=0, column=2, padx=5, pady=5)
-        self.resume_button.grid(row=0, column=3, padx=5, pady=5)
+        
+        self.record_button.grid(row=0, column=0, padx=5, pady=5)
+        self.open_button.grid(row=0, column=1, padx=5, pady=5)
+        self.play_button.grid(row=0, column=2, padx=5, pady=5)
 
         # Initialize pygame
         pygame.mixer.init()
@@ -44,30 +47,36 @@ class AudioPlayerApp:
 
         # Initialize playback state
         self.paused = False
+    
+    
+    def record_audio(self):
+        freq = self.config["settings"]["freq"]
+        duration = self.config["settings"]["duration"]
+        
+        try:
+            recording = sd.rec(int(duration * freq), samplerate=freq, channels=4)
+            sd.wait()  # Wait until recording is finished
+            audio_path = os.path.join(self.config["settings"]["user_path"], "recording.wav")
+            write(audio_path, freq, recording)
+            print(f"Recording saved to {audio_path}")
+        except Exception as e:
+            print(f"An error occurred while recording audio: {e}")
+
+
 
     def open_audio(self):
         file_path = filedialog.askopenfilename(filetypes=[("Audio Files", "*.mp3 *.wav")])
         if file_path:
             self.audio_file = file_path
             self.play_button.config(state=tk.NORMAL)
+            
 
     def play_audio(self):
         pygame.mixer.music.load(self.audio_file)
         pygame.mixer.music.play()
         self.play_button.config(state=tk.DISABLED)
         self.pause_button.config(state=tk.NORMAL)
-
-    def pause_audio(self):
-        pygame.mixer.music.pause()
-        self.pause_button.config(state=tk.DISABLED)
-        self.resume_button.config(state=tk.NORMAL)
-        self.paused = True
-
-    def resume_audio(self):
-        pygame.mixer.music.unpause()
-        self.resume_button.config(state=tk.DISABLED)
-        self.pause_button.config(state=tk.NORMAL)
-        self.paused = False
+        
 
     def on_closing(self):
         # Check if audio is currently playing
@@ -75,6 +84,7 @@ class AudioPlayerApp:
             # Stop audio playback before closing the application
             pygame.mixer.music.stop()
         self.root.destroy()
+
 
     def send_message(self):
         user_message = self.user_input.get()
@@ -86,6 +96,7 @@ class AudioPlayerApp:
             self.respond(user_message)
         return user_message
 
+
     def respond(self, user_message):
         if user_message:
             agent_response = user_message
@@ -94,8 +105,4 @@ class AudioPlayerApp:
         self.chat_area.config(state='normal')
         self.chat_area.insert(tk.END, agent_response + "\n")
         self.chat_area.config(state='disabled')
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = AudioPlayerApp(root)
-    root.mainloop()
+        

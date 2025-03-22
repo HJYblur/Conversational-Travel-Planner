@@ -2,3 +2,5 @@ settings:
   data_path: "./data"
   user_path: "./data/sofia"
   k: 3
+  freq: 48000
+  duration: 10 # max time for recoding the audio: 10s

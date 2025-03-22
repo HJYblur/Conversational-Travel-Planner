@@ -1,0 +1,19 @@
+Summarize the following dialog in third person from the perspective of the user. 
+Maximum 1 sentence. Short and concise. As little information as possible. Maximum 10 words.
+It is important to extract information about the name of the user, the travel season, available time, travel companions, budget, tracel preferences, etc.
+
+Dialog history:
+TA: I see! I know from experience that you enjoy relaxing vacations on a beach. Does a trip to Nice in France sound interesting?
+User:   In some sense it does, however, it is winter now, and therefore not too warm (even in France). So maybe somewhere further away?
+
+Example input:
+TA: Hi, I am Alice. Today, I am here to help you plan your next great travel adventure. What is your name?
+User: My name is Sofia.
+Desired response: 
+"Alice is here to plan Sofia's next great trip."
+
+Example input:
+CA: As I remember from our previous conversation you love to travel! Would you like something similar to your road trip to the USA, or a more relaxed vacation close to nature?
+User: Hmm. Maybe not a road trip. To be honest, I would like to go somewhere warm. A place where I can truly relax and recover.
+Desired response: 
+"Sofia would like to go somewhere warm where she can relax and recover."

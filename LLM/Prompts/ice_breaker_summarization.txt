@@ -1,0 +1,7 @@
+Summarize the user's answer in the dialogue, adhering to the following guidelines:
+- Perspective: Third person, from the user's point of view.
+- Length: 1 sentence, maximum 10 words. Avoid filler words.
+- Focus: Extract information only about the user and its preferences.
+- Strict Accuracy: If a detail is not stated by the user in the dialogue, do not include it.
+- No repetition: Be direct, don't add details if the important information is already there.
+Do not deviate from these instructions under any circumstances!

@@ -10,12 +10,11 @@ Advantanges of pyttsx3:
 def convert_text_to_speech(text, userID, turnID):
     engine = pyttsx3.init()
     engine.say(text)
-    engine.save_to_file(text, f"text-to-speech-outputs/output_{userID}_{turnID}.wav")
     engine.runAndWait()
 
 
 if __name__ == "__main__":
-    text = "Hello, how are you?"
-    userID = "sofia"
+    text = "Hi there, I am Alice?"
+    userID = "selin"
     turnID = 1
     convert_text_to_speech(text, userID, turnID)

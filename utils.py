@@ -3,6 +3,7 @@ import os
 import json
 import tkinter as tk
 import sounddevice as sd
+import torch
 from gui import AudioPlayerApp
 from event import Event
 from configure_loader import load_config
@@ -33,6 +34,15 @@ def GUI_init():
     root = tk.Tk()
     app = AudioPlayerApp(root)
     root.mainloop()
+    
+
+def perception_init():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    config["settings"]["device"] = str(device)
+
+    with open('config.yaml', 'w') as config_file:
+        yaml.dump(config, config_file)
+
     
 
 def load_json(file_path):

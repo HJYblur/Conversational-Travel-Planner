@@ -6,6 +6,7 @@ def main():
     # Step1: System initialization
     record_init()
     GUI_init()
+    perception_init()
     
     # Step2-6 should be in a for loop
     # Step2: Recode the user speech and convert it to text (livekit)

@@ -5,6 +5,8 @@ import time
 import torch
 import numpy as np
 import librosa
+import soundfile as sf
+from tensorflow.keras.models import load_model
 from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
 from configure_loader import load_config
 
@@ -57,9 +59,112 @@ def predict_emotion(audio, model, feature_extractor, id2label, max_duration=30.0
 
     return predicted_label
 
+
+class FeatureExtractor:
+    """
+    Reference: https://huggingface.co/spaces/Rashmiranjan28/Speech_Emotion_Recognition/tree/main
+    """
+    @staticmethod
+    def librosa_features_extractor(file_name):
+        audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
+        
+        # Extract MFCC features
+        mfccs_features = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=25)
+        mfccs_scaled_features = np.mean(mfccs_features.T, axis=0)
+
+        # Extract Zero Crossing Rate
+        zcr = librosa.feature.zero_crossing_rate(y=audio)
+        zcr_scaled_features = np.mean(zcr.T, axis=0)
+
+        # Extract Chroma Features
+        chroma = librosa.feature.chroma_stft(y=audio, sr=sample_rate)
+        chroma_scaled_features = np.mean(chroma.T, axis=0)
+
+        # Extract Mel Spectrogram Features
+        mel = librosa.feature.melspectrogram(y=audio, sr=sample_rate)
+        mel_scaled_features = np.mean(mel.T, axis=0)
+
+        # Concatenate all features into a single array
+        features = np.hstack((mfccs_scaled_features, zcr_scaled_features, chroma_scaled_features, mel_scaled_features))
+        return features
+
+class EmotionPredictor:
+    def __init__(self, model_path, feature_extractor):
+        self.model = load_model(model_path)
+        self.feature_extractor = feature_extractor
+        self.label_mapping = {0: 'angry',
+                    1: 'excited',
+                    2: 'fear',
+                    3: 'happy',
+                    4: 'neutral',
+                    5: 'sad'}
+
+    """
+    Reference: https://huggingface.co/spaces/Rashmiranjan28/Speech_Emotion_Recognition/tree/main
+    """
+    def predict_emotions(self, audio_path, interval=3.0):
+        audio_data, samplerate = sf.read(audio_path)
+        duration = len(audio_data) / samplerate
+        emotions = []
+
+        for start in np.arange(0, duration, interval):
+            end = start + interval
+            if end > duration:
+                end = duration
+            segment = audio_data[int(start*samplerate):int(end*samplerate)]
+            segment_path = 'segment.wav'
+            sf.write(segment_path, segment, samplerate)
+
+            feat = self.feature_extractor(segment_path)
+            feat = feat.reshape(1, -1)
+            predictions = self.model.predict(feat)
+            predicted_label = np.argmax(predictions, axis=1)
+            emotions.append((start, end, self.label_mapping[predicted_label[0]]))
+
+            # Cleanup segment file
+            os.remove(segment_path)
+
+        return emotions
     
     
-if __name__ == "__main__":
+def init_librosa_model():
+    global emotion_predictor
+    if "emotion_predictor" not in globals():
+        feature_extractor = FeatureExtractor.librosa_features_extractor
+        emotion_predictor = EmotionPredictor(config["settings"]["lstm_model_path"], feature_extractor)
+    return emotion_predictor
+
+
+
+def conflict_detection(test_file_path, test_file):
+    connotation_dict = {
+        "angry": "negative",
+        "disgust": "negative",
+        "fear": "negative",
+        "fearful": "negative",
+        "happy": "positive",
+        "neutral": "neutral",
+        "sad": "negative",
+        "surprised": "positive",
+        "excited": "positive"
+    }
+    librosa_emotion = emotion_predictor.predict_emotions(test_file_path)[0][2]
+    whisper_emotion = predict_emotion(test_file, whisper_model, whisper_feature_extractor, id2label)
+    print(f"Librosa emotion: {librosa_emotion}, Whisper emotion: {whisper_emotion}")
+
+    librosa_connotation = connotation_dict[librosa_emotion]
+    whisper_connotation = connotation_dict[whisper_emotion]
+
+    # Conflict detected, use the speech emotion
+    if librosa_connotation == "negative" and whisper_connotation == "positive" or librosa_connotation == "positive" and whisper_connotation == "negative":
+        print(f"Conflict detected, use the speech emotion: {librosa_emotion}")
+        return librosa_emotion
+    else:
+        print(f"No conflict, use the text emotion: {whisper_emotion}")
+        return whisper_emotion
+    
+    
+def perception():
     config = load_config()
     
     # Load audio
@@ -71,7 +176,7 @@ if __name__ == "__main__":
     result = model.transcribe(audio)
     print("Transcribed text:", result['text'])
     
-    # Emotion detection using whisper
+    # Emotion detection
     whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
-    emotion = predict_emotion(audio, whisper_model, whisper_feature_extractor, id2label)
-    print("Predicted emotion:", emotion)
+    emotion_predictor = init_librosa_model()
+    conflict_detection(audio_path, audio)

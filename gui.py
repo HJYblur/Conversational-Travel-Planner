@@ -5,7 +5,6 @@ import sounddevice as sd
 import wavio
 import numpy as np
 import threading
-from scipy.io.wavfile import write
 from configure_loader import load_config
 
 class AudioPlayerApp:
@@ -66,6 +65,7 @@ class AudioPlayerApp:
         else:
             # If the user cancels the input dialog, close the application
             self.root.destroy()
+            
 
     def start_recording(self):
         if not self.recording:
@@ -95,6 +95,7 @@ class AudioPlayerApp:
         print("Recording stopped. Saving file...")
 
         if self.audio_data:
+            # Stop recoding the file
             audio_array = np.concatenate(self.audio_data, axis=0)  # Convert list to NumPy array
             audio_path = os.path.join(self.config["settings"]["user_path"], "recording.wav")
             wavio.write(audio_path, audio_array, self.config['recording']['samplerate'], sampwidth=2)
@@ -112,5 +113,10 @@ class AudioPlayerApp:
         self.display_bar.config(state='disabled')
             
             
+    def speech2text(self):
+        #TODO: Trigger speech 2 text module
+        pass
+        
+        
     def on_closing(self):
         self.root.destroy()

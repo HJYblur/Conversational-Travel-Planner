@@ -163,7 +163,7 @@ def conflict_detection(test_file_path, test_file):
         return whisper_emotion
     
     
-def perception():
+def percept():
     config = load_config()
     
     # Load audio
@@ -173,9 +173,12 @@ def perception():
     # Transcripted text
     model = init_speech2text_model(device=config["settings"]["device"])
     result = model.transcribe(audio)
-    print("Transcribed text:", result['text'])
+    text = result['text']
+    print("Transcripted text: ", text)
     
     # Emotion detection
     whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
     emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
-    conflict_detection(audio_path, audio)
+    emotion = conflict_detection(audio_path, audio)
+    
+    return text, emotion

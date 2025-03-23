@@ -6,22 +6,26 @@ import wavio
 import numpy as np
 import threading
 from configure_loader import load_config
+from perception import percept
+from information_retriever import retrieve
 
 class AudioPlayerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Conversational Travel Planner")
+        self.CA_name = "Emma"
         self.center_window()
         self.config = load_config()
-
-        self.planner_name_label = tk.Label(root, text="Alice", font=("Helvetica", 32))
+        
+        # First row: Title/Name of our CA
+        self.planner_name_label = tk.Label(root, text=self.CA_name, font=("Helvetica", 32))
         self.planner_name_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
 
-        # Create a display bar for displaying different text/animation according to the input
+        # Second Row: display bar for displaying different text/animation according to the input
         self.display_bar = scrolledtext.ScrolledText(root, wrap=tk.WORD, state='disabled', width=50, height=3)
         self.display_bar.grid(row=1, column=0, padx=10, pady=10, columnspan=2)
 
-        # Create a frame for the audio controls
+        # Third Row: audio controls
         audio_frame = tk.Frame(root)
         audio_frame.grid(row=2, column=0, padx=10, pady=10, columnspan=2)
 
@@ -31,24 +35,66 @@ class AudioPlayerApp:
         self.start_button.grid(row=0, column=0, padx=5, pady=5)
         self.end_button.grid(row=0, column=1, padx=5, pady=5)
 
-        # Register a callback to stop audio when the window is closed
         root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Initialize recording state
         self.recording = False
         self.audio_data = []
+        self.text = "OvO"
+        self.emotion = "happy"
+        self.preference = "TxT"
+
+        # Initialize state machine
+        self.state = "Start"
+        self.update()
+
+
+    def update(self):
+        if not hasattr(self, 'previous_state') or self.state != self.previous_state:
+            print(f"Current State: {self.state}")
+            self.previous_state = self.state
+        if self.state == "Start":
+            self.start()
+            self.state = "Idle"
+        elif self.state == "Idle":
+        # Step2: Record the user speech
+            if self.start_button.config('state')[-1] == tk.DISABLED:
+                self.state = "Recording"
+                self.display(f"{self.CA_name} is listening!")
+        elif self.state == "Recording":
+            # Wait for the user to click the "End Recording" button
+            if self.end_button.config('state')[-1] == tk.DISABLED:
+                self.display(f"Ahh, {self.CA_name} get you :)")
+                self.state = 'RecordFinish'
+        elif self.state == 'RecordFinish':
+            # Step3: Speech to Text & Emotion Detection
+            self.display(f"{self.CA_name} is thinking!")
+            self.text, self.emotion = percept()
+            self.state = 'Summary'
+        elif self.state == 'Summary':
+            # Step4: Summarize short-term memory from the text
+            # TODO: interpolate the summary function
+            self.display("Summarizing the text now\n")
+            self.state = 'retrieval'
+        elif self.state == 'retrieval':
+            # Step5: Information retrieval from long-term memory(preference)
+            self.preference = retrieve(self.text)
+            self.state = 'GeneratingResponce'
+        elif self.state == 'GeneratingResponce':
+            # Step6: Communicate with LLM to generate the response
+            # TODO: interpolate the Responce Generation function
+            self.display(f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}")
+            self.state = 'Text2Speech'
+        elif self.state == 'Text2Speech':
+            # Step7: Convert the LLM response to speech and output to users
+            # TODO: interpolate the Text2Speech function
+            self.state = 'Idle'
+        elif self.state == "Stopped":
+            self.on_closing()
         
-        # Initialize GUI display
-        self.start()
-
-
-    def center_window(self):
-        self.root.update_idletasks()
-        width = self.root.winfo_width() * 2
-        height = self.root.winfo_height()
-        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.root.winfo_screenheight() // 2) - (height // 2)
-        self.root.geometry(f'{width}x{height}+{x}+{y}')
+        # Schedule the next state check
+        self.root.after(100, self.update)
+        
         
             
     def start(self):
@@ -102,7 +148,7 @@ class AudioPlayerApp:
             print(f"Saved as {audio_path}")
             self.start_button.config(state=tk.NORMAL)
             self.end_button.config(state=tk.DISABLED)
-            self.display(f"Recording saved to {audio_path}\n", True)
+            # self.display(f"Recording saved to {audio_path}\n", True)
             
             
     def display(self, str = str, rewrite = True):
@@ -111,12 +157,15 @@ class AudioPlayerApp:
             self.display_bar.delete(1.0, tk.END)
         self.display_bar.insert(tk.END, str, "center")
         self.display_bar.config(state='disabled')
-            
-            
-    def speech2text(self):
-        #TODO: Trigger speech 2 text module
-        pass
         
+        
+    def center_window(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width() * 2
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
         
     def on_closing(self):
         self.root.destroy()

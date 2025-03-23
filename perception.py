@@ -127,13 +127,12 @@ class EmotionPredictor:
         return emotions
     
     
-def init_librosa_model():
+def init_librosa_model(model_path):
     global emotion_predictor
     if "emotion_predictor" not in globals():
         feature_extractor = FeatureExtractor.librosa_features_extractor
-        emotion_predictor = EmotionPredictor(config["settings"]["lstm_model_path"], feature_extractor)
+        emotion_predictor = EmotionPredictor(model_path, feature_extractor)
     return emotion_predictor
-
 
 
 def conflict_detection(test_file_path, test_file):
@@ -178,5 +177,5 @@ def perception():
     
     # Emotion detection
     whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
-    emotion_predictor = init_librosa_model()
+    emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
     conflict_detection(audio_path, audio)

@@ -24,3 +24,5 @@ torch
 requests
 pygame
 recorder
+soundfile
+wavio

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import scrolledtext, simpledialog
 import os
+import yaml
 import sounddevice as sd
 import wavio
 import numpy as np
@@ -108,7 +109,10 @@ class AudioPlayerApp:
             # Initialize the data directory
             root_path = self.config['settings']['data_path']
             user_path = os.path.join(root_path, user)
+            self.config["settings"]['user'] = user
             self.config['settings']['user_path'] = user_path
+            with open('config.yaml', 'w') as config_file:
+                yaml.dump(self.config, config_file)
             os.makedirs(user_path, exist_ok=True)
             
             self.display(f"Hello {user}, welcome to the travel recommendation agent!\n")

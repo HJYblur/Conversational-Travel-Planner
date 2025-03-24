@@ -27,3 +27,4 @@ recorder
 soundfile
 wavio
 sounddevice
+pyttsx3

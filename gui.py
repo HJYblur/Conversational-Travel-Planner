@@ -8,6 +8,7 @@ import threading
 from configure_loader import load_config
 from perception import percept
 from information_retriever import retrieve
+from text_to_speech import text2speech
 
 class AudioPlayerApp:
     def __init__(self, root):
@@ -43,6 +44,7 @@ class AudioPlayerApp:
         self.text = "OvO"
         self.emotion = "happy"
         self.preference = "TxT"
+        self.agent_response = "Emma's response"
 
         # Initialize state machine
         self.state = "Start"
@@ -83,11 +85,13 @@ class AudioPlayerApp:
         elif self.state == 'GeneratingResponce':
             # Step6: Communicate with LLM to generate the response
             # TODO: interpolate the Responce Generation function
-            self.display(f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}")
+            self.agent_response = f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}"
+            self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
             # Step7: Convert the LLM response to speech and output to users
             # TODO: interpolate the Text2Speech function
+            text2speech(self.agent_response, self.config['settings']['user_path'], 1)
             self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()

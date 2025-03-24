@@ -26,3 +26,4 @@ pygame
 recorder
 soundfile
 wavio
+sounddevice

@@ -19,7 +19,7 @@ def preprocess_text(agent_text):
     return sentences
     
 
-def convert_text_to_speech(text, userID, turnID):
+def text2speech(text, userID, turnID):
     '''
         Text-to-speech conversion using pyttsx3 library.
     '''

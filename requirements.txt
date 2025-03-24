@@ -28,3 +28,5 @@ soundfile
 wavio
 sounddevice
 pyttsx3
+streamlit
+notion-client==1.0.0

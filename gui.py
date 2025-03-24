@@ -15,31 +15,47 @@ class AudioPlayerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Conversational Travel Planner")
+        self.config = load_config()
         self.CA_name = "Emma"
         self.center_window()
-        self.config = load_config()
-        
-        # First row: Title/Name of our CA
-        self.planner_name_label = tk.Label(root, text=self.CA_name, font=("Helvetica", 32))
-        self.planner_name_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
 
-        # Second Row: display bar for displaying different text/animation according to the input
-        self.display_bar = scrolledtext.ScrolledText(root, wrap=tk.WORD, state='disabled', width=50, height=3)
-        self.display_bar.grid(row=1, column=0, padx=10, pady=10, columnspan=2)
+        # Define styling options
+        title_font = ("SF pro", 32, "bold")
+        text_font = ("SF pro", 16)
+        btn_font = ("SF pro", 12, "bold")
 
-        # Third Row: audio controls
-        audio_frame = tk.Frame(root)
-        audio_frame.grid(row=2, column=0, padx=10, pady=10, columnspan=2)
+        # === Title Section ===
+        title_frame = tk.Frame(root, pady=10)
+        title_frame.pack(fill="x")
 
-        self.start_button = tk.Button(audio_frame, text="Start Recording", command=self.start_recording)
-        self.end_button = tk.Button(audio_frame, text="End Recording", command=self.stop_recording, state=tk.DISABLED)
-        
-        self.start_button.grid(row=0, column=0, padx=5, pady=5)
-        self.end_button.grid(row=0, column=1, padx=5, pady=5)
+        self.planner_name_label = tk.Label(title_frame, text=self.CA_name, font=title_font, fg="#3B3B98")
+        self.planner_name_label.pack()
 
+        # === Display Bar (Text) ===
+        display_frame = tk.Frame(root, pady=10)
+        display_frame.pack(fill="x", padx=20)
+
+        self.display_bar = tk.Text(
+            display_frame, wrap=tk.WORD, state="disabled", 
+            width=60, height=4, font=text_font, bg="#F8F8F8"
+        )
+        self.display_bar.tag_configure("center", justify='center')
+        self.display_bar.pack(fill="both", expand=True)
+
+        # === Audio Control Buttons ===
+        audio_frame = tk.Frame(root, pady=10)
+        audio_frame.pack()
+
+        self.start_button = tk.Button(audio_frame, text="Start Recording", font=btn_font, command=self.start_recording, bg="#4CAF50")
+        self.end_button = tk.Button(audio_frame, text="End Recording", font=btn_font, command=self.stop_recording, bg="#F44336", state=tk.DISABLED)
+
+        self.start_button.grid(row=0, column=0, padx=10, pady=5)
+        self.end_button.grid(row=0, column=1, padx=10, pady=5)
+
+        # Closing Protocol
         root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        # Initialize recording state
+        # Initialize Recording State
         self.recording = False
         self.audio_data = []
         self.text = "OvO"
@@ -47,10 +63,10 @@ class AudioPlayerApp:
         self.preference = "TxT"
         self.agent_response = "Emma's response"
 
-        # Initialize state machine
+        # Initialize State Machine
         self.state = "Start"
         self.update()
-
+        
 
     def update(self):
         if not hasattr(self, 'previous_state') or self.state != self.previous_state:
@@ -159,21 +175,24 @@ class AudioPlayerApp:
             # self.display(f"Recording saved to {audio_path}\n", True)
             
             
-    def display(self, str = str, rewrite = True):
-        self.display_bar.config(state='normal')
+    def display(self, text="", rewrite=True):
+        """ Updates the display bar with new text """
+        self.display_bar.config(state="normal")
         if rewrite:
             self.display_bar.delete(1.0, tk.END)
-        self.display_bar.insert(tk.END, str, "center")
-        self.display_bar.config(state='disabled')
-        
-        
+        self.display_bar.insert(tk.END, text + "\n", "center")
+        self.display_bar.config(state="disabled")
+
+
     def center_window(self):
+        """ Centers the window on the screen """
         self.root.update_idletasks()
-        width = self.root.winfo_width() * 2
-        height = self.root.winfo_height()
+        width = 600  # Set a fixed width
+        height = 240  # Set a fixed height
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
-        self.root.geometry(f'{width}x{height}+{x}+{y}')
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
+        
         
     def on_closing(self):
         self.root.destroy()

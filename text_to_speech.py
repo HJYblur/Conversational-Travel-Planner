@@ -43,4 +43,4 @@ if __name__ == "__main__":
     agent_text = "Hi, I am Alice. Today, I am here to help you plan your next great travel adventure. What is your name?"
     userID = "selin"
     turnID = 1
-    convert_text_to_speech(agent_text, userID, turnID)
+    text2speech(agent_text, userID, turnID)

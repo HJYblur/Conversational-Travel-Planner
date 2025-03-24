@@ -108,7 +108,7 @@ class AudioPlayerApp:
         elif self.state == 'Text2Speech':
             # Step7: Convert the LLM response to speech and output to users
             # TODO: interpolate the Text2Speech function
-            text2speech(self.agent_response, self.config['settings']['user_path'], 1)
+            text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()
@@ -132,6 +132,7 @@ class AudioPlayerApp:
             os.makedirs(user_path, exist_ok=True)
             
             self.display(f"Hello {user}, welcome to the travel recommendation agent!\n")
+            text2speech(f"Hello {user}, welcome to the travel recommendation agent!\n")
         else:
             # If the user cancels the input dialog, close the application
             self.root.destroy()
@@ -182,7 +183,6 @@ class AudioPlayerApp:
             self.display_bar.delete(1.0, tk.END)
         self.display_bar.insert(tk.END, text + "\n", "center")
         self.display_bar.config(state="disabled")
-        text2speech(text)
 
 
     def center_window(self):

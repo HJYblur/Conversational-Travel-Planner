@@ -1,35 +1,77 @@
 import streamlit as st
-import sounddevice as sd
-import numpy as np
-import wavio
+from st_audiorec import st_audiorec
 import os
 import yaml
 from configure_loader import load_config
-
-# GLOBAL recording buffer (safe for callback)
-recording_buffer = []
+from perception import percept
+from information_retriever import retrieve
+from text_to_speech import text2speech
 
 class TravelPlannerApp:
     def __init__(self):
         self.setup_session_state()
-        self.samplerate = st.session_state.config["recording"]["samplerate"]
-        self.channels = st.session_state.config["recording"]["channels"]
-        self.device_index = st.session_state.config["recording"]["device_index"]
-        self.audio_path = None
-        self.stream = None
+        self.CA_name = "Emma"
+        self.text = "OvO"
+        self.emotion = "happy"
+        self.preference = "TxT"
+        self.agent_response = "Emma's response"
+
+        self.state = 'Start'
+        self.run()
+        
 
     def setup_session_state(self):
         if "config" not in st.session_state:
             st.session_state.config = load_config()
         if "username" not in st.session_state:
             st.session_state.username = None
-        if "is_recording" not in st.session_state:
-            st.session_state.is_recording = False
         if "latest_audio" not in st.session_state:
             st.session_state.latest_audio = None
 
-    def ask_username(self):
-        st.title("👋 Meet Emma, your Conversational Travel Planner")
+            
+    def run(self):
+        if not hasattr(self, 'previous_state') or self.state != self.previous_state:
+            print(f"Current State: {self.state}")
+            self.previous_state = self.state
+        if self.state == "Start":
+            self.start()
+            self.state = "Idle"
+        elif self.state == "Idle":
+            # Step2: Record the user speech
+            self.post_login_ui()
+            self.record_audio()
+        elif self.state == 'RecordFinish':
+            # Step3: Speech to Text & Emotion Detection
+            self.text, self.emotion = percept()
+            self.state = 'Summary'
+        elif self.state == 'Summary':
+            # Step4: Summarize short-term memory from the text
+            # TODO: interpolate the summary function
+            self.state = 'retrieval'
+        elif self.state == 'retrieval':
+            # Step5: Information retrieval from long-term memory(preference)
+            self.preference = retrieve(self.text)
+            self.state = 'GeneratingResponce'
+        elif self.state == 'GeneratingResponce':
+            # Step6: Communicate with LLM to generate the response
+            # TODO: interpolate the Responce Generation function
+            self.agent_response = f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}"
+            self.state = 'Text2Speech'
+        elif self.state == 'Text2Speech':
+            # Step7: Convert the LLM response to speech and output to users
+            # TODO: interpolate the Text2Speech function
+            text2speech(self.agent_response, self.config['settings']['user_path'], 1)
+            self.state = 'Idle'
+        elif self.state == "Stopped":
+            self.on_closing()
+        
+        # Schedule the next state check
+        
+        
+        
+        
+    def start(self):
+        st.title(f"👋 Meet {self.CA_name}, your Conversational Travel Planner")
         if st.session_state.username is None:
             user = st.text_input("Please enter your name:")
             if st.button("Start"):
@@ -47,66 +89,30 @@ class TravelPlannerApp:
                     st.warning("Please enter your name to continue.")
             st.stop()
 
+
     def post_login_ui(self):
         st.subheader(f"Hi {st.session_state.username}, I'm Emma! 🌍")
         self.audio_path = os.path.join(st.session_state.config["settings"]["user_path"], "recording.wav")
 
-    def start_recording(self):
-        global recording_buffer
-        recording_buffer = []
-        st.session_state.is_recording = True
 
-        def callback(indata, frames, time, status):
-            if status:
-                print(status)
-            recording_buffer.append(indata.copy())
-
-        self.stream = sd.InputStream(
-            samplerate=self.samplerate,
-            channels=self.channels,
-            device=self.device_index,
-            callback=callback,
-        )
-        self.stream.start()
-        st.session_state.stream = self.stream
-        st.toast("🎙️ Emma is listening...")
-
-    def stop_recording(self):
-        global recording_buffer
-        if "stream" in st.session_state and st.session_state.stream:
-            st.session_state.stream.stop()
-            st.session_state.stream.close()
-            st.session_state.is_recording = False
-
-            if recording_buffer:
-                audio_array = np.concatenate(recording_buffer, axis=0)
-                wavio.write(self.audio_path, audio_array, self.samplerate, sampwidth=2)
-                st.session_state.latest_audio = self.audio_path
-                st.success(f"Recording saved to {self.audio_path}")
-                recording_buffer = []
-            else:
-                st.warning("No audio data recorded.")
-        else:
-            st.warning("Recording was not active.")
-
-    def ui_controls(self):
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Start Recording", disabled=st.session_state.is_recording):
-                self.start_recording()
-        with col2:
-            if st.button("Stop Recording", disabled=not st.session_state.is_recording):
-                self.stop_recording()
-
-    def playback(self):
-        if st.session_state.latest_audio and os.path.exists(st.session_state.latest_audio):
-            st.audio(st.session_state.latest_audio)
-
-    def run(self):
-        self.ask_username()
-        self.post_login_ui()
-        self.ui_controls()
-        self.playback()
+    def record_audio(self):
+        audio_data = st_audiorec()
+        # add some spacing and informative messages
+        col_info, col_space = st.columns([0.57, 0.43])
+        with col_info:
+            st.write('\n')  # add vertical spacer
+            st.write('\n')  # add vertical spacer
+            st.write('Note: Tell you how to record it 🎈')
+            
+        if audio_data:
+            with open(self.audio_path, "wb") as f:
+                f.write(audio_data)
+            st.success(f"{self.CA_name} heard you!")
+            self.state = "RecordFinish"
+            self.run()
+        
+        
+        
 
 
 # === Main Execution ===

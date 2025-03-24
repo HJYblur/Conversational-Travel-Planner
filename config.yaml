@@ -7,5 +7,5 @@ settings:
   device: cpu
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
-  user: lemonselin
-  user_path: ./data/lemonselin
+  user: sofia
+  user_path: ./data/sofia

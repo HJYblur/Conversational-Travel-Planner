@@ -19,7 +19,7 @@ def preprocess_text(agent_text):
     return sentences
     
 
-def text2speech(text, userID, turnID):
+def text2speech(text):
     '''
         Text-to-speech conversion using pyttsx3 library.
     '''
@@ -41,6 +41,6 @@ def text2speech(text, userID, turnID):
 
 if __name__ == "__main__":
     agent_text = "Hi, I am Alice. Today, I am here to help you plan your next great travel adventure. What is your name?"
-    userID = "selin"
-    turnID = 1
-    text2speech(agent_text, userID, turnID)
+    # userID = "selin"
+    # turnID = 1
+    text2speech(agent_text)

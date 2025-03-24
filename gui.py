@@ -182,6 +182,7 @@ class AudioPlayerApp:
             self.display_bar.delete(1.0, tk.END)
         self.display_bar.insert(tk.END, text + "\n", "center")
         self.display_bar.config(state="disabled")
+        text2speech(text)
 
 
     def center_window(self):

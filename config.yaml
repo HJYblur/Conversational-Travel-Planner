@@ -1,7 +1,7 @@
 recording:
   channels: 1
   device_index: 0
-  samplerate: 24000
+  samplerate: 48000
 settings:
   data_path: ./data
   device: cpu

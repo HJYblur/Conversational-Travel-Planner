@@ -1,3 +1,4 @@
+import torch
 import streamlit as st
 from st_audiorec import st_audiorec
 import os
@@ -16,10 +17,6 @@ class TravelPlannerApp:
         self.preference = "TxT"
         self.agent_response = "Emma's response"
 
-        self.state = 'Start'
-        self.run()
-        
-
     def setup_session_state(self):
         if "config" not in st.session_state:
             st.session_state.config = load_config()
@@ -27,49 +24,37 @@ class TravelPlannerApp:
             st.session_state.username = None
         if "latest_audio" not in st.session_state:
             st.session_state.latest_audio = None
+        if "state" not in st.session_state:
+            st.session_state.state = "Start"
 
-            
     def run(self):
-        if not hasattr(self, 'previous_state') or self.state != self.previous_state:
-            print(f"Current State: {self.state}")
-            self.previous_state = self.state
-        if self.state == "Start":
+        if st.session_state.state == "Start":
             self.start()
-            self.state = "Idle"
-        elif self.state == "Idle":
-            # Step2: Record the user speech
+        elif st.session_state.state == "Idle":
             self.post_login_ui()
             self.record_audio()
-        elif self.state == 'RecordFinish':
-            # Step3: Speech to Text & Emotion Detection
+        elif st.session_state.state == 'RecordFinish':
             self.text, self.emotion = percept()
-            self.state = 'Summary'
-        elif self.state == 'Summary':
-            # Step4: Summarize short-term memory from the text
-            # TODO: interpolate the summary function
-            self.state = 'retrieval'
-        elif self.state == 'retrieval':
-            # Step5: Information retrieval from long-term memory(preference)
+            print("percep")
+            st.session_state.state = 'Summary'
+            
+        elif st.session_state.state == 'Summary':
             self.preference = retrieve(self.text)
-            self.state = 'GeneratingResponce'
-        elif self.state == 'GeneratingResponce':
-            # Step6: Communicate with LLM to generate the response
-            # TODO: interpolate the Responce Generation function
-            self.agent_response = f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}"
-            self.state = 'Text2Speech'
-        elif self.state == 'Text2Speech':
-            # Step7: Convert the LLM response to speech and output to users
-            # TODO: interpolate the Text2Speech function
-            text2speech(self.agent_response, self.config['settings']['user_path'], 1)
-            self.state = 'Idle'
-        elif self.state == "Stopped":
-            self.on_closing()
-        
-        # Schedule the next state check
-        
-        
-        
-        
+            print("retrieve")
+            st.session_state.state = 'GeneratingResponce'
+            
+        elif st.session_state.state == 'GeneratingResponce':
+            self.agent_response = f"Generating Response of {self.text} with {self.emotion} mood, preference: {self.preference}"
+            st.session_state.state = 'Text2Speech'
+            
+        elif st.session_state.state == 'Text2Speech':
+            text2speech(self.agent_response, st.session_state.config['settings']['user_path'], 1)
+            print("text2speech")
+            st.session_state.state = 'Idle'
+            
+        elif st.session_state.state == "Stopped":
+            st.stop()
+
     def start(self):
         st.title(f"👋 Meet {self.CA_name}, your Conversational Travel Planner")
         if st.session_state.username is None:
@@ -84,36 +69,24 @@ class TravelPlannerApp:
                     with open("config.yaml", "w") as f:
                         yaml.dump(st.session_state.config, f)
                     st.success(f"Welcome, {user}!")
-                    st.rerun()
+                    st.session_state.state = "Idle"
+                    
                 else:
                     st.warning("Please enter your name to continue.")
             st.stop()
 
-
     def post_login_ui(self):
-        st.subheader(f"Hi {st.session_state.username}, I'm Emma! 🌍")
+        st.subheader(f"Hi {st.session_state.username}, I'm {self.CA_name}! 🌍")
         self.audio_path = os.path.join(st.session_state.config["settings"]["user_path"], "recording.wav")
-
 
     def record_audio(self):
         audio_data = st_audiorec()
-        # add some spacing and informative messages
-        col_info, col_space = st.columns([0.57, 0.43])
-        with col_info:
-            st.write('\n')  # add vertical spacer
-            st.write('\n')  # add vertical spacer
-            st.write('Note: Tell you how to record it 🎈')
-            
         if audio_data:
             with open(self.audio_path, "wb") as f:
                 f.write(audio_data)
             st.success(f"{self.CA_name} heard you!")
-            self.state = "RecordFinish"
-            self.run()
-        
-        
-        
-
+            st.session_state.state = "RecordFinish"
+            
 
 # === Main Execution ===
 if __name__ == "__main__":

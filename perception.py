@@ -136,6 +136,10 @@ def init_librosa_model(model_path):
 
 
 def conflict_detection(test_file_path, test_file):
+    '''
+    This function detects the conflict between the emotion predicted by the text and speech.
+    If there is an emotion conflict, return True, else return False.
+    '''
     connotation_dict = {
         "angry": "negative",
         "disgust": "negative",
@@ -157,10 +161,10 @@ def conflict_detection(test_file_path, test_file):
     # Conflict detected, use the speech emotion
     if librosa_connotation == "negative" and whisper_connotation == "positive" or librosa_connotation == "positive" and whisper_connotation == "negative":
         print(f"Conflict detected, use the speech emotion: {librosa_emotion}")
-        return librosa_emotion
+        return True # There is an irony
     else:
         print(f"No conflict, use the text emotion: {whisper_emotion}")
-        return whisper_emotion
+        return False
     
     
 def percept():

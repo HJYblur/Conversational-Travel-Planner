@@ -26,13 +26,15 @@ def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
     if irony:
         irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialog:\n"
     
-    dialog_history = f"Dialog history:\nQuestion: {question}\nUser_answer: {user_answer}\n" 
+    dialog_history = f"Dialog history:\nQuestion: {question}User_answer: {user_answer}"
 
     if user_preferences:
         user_preferences = "User Preferences: " + ", ".join(user_preferences)
         data["prompt"] = prompt_text + user_text + irony_text + dialog_history + user_preferences
     else:
         data["prompt"] = prompt_text + user_text + irony_text + dialog_history
+
+    print(data["prompt"])
 
     recommendation = ""
     response = requests.post(url, json=data, stream=True)
@@ -49,10 +51,10 @@ def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
     return recommendation
 
 
-def summarization(question, user_answer, irony):
+def summarization(question, user_answer, irony): # TODO
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
 
-    return prompt(prompt_file_path, question, user_answer, irony)
+    # return prompt(prompt_file_path, question, user_answer, irony)
 
 
 def memory_query_generation(question, user_answer, irony):

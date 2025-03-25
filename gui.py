@@ -38,7 +38,7 @@ class AudioPlayerApp:
 
         self.display_bar = tk.Text(
             display_frame, wrap=tk.WORD, state="disabled", 
-            width=60, height=4, font=text_font, bg="#F8F8F8"
+            width=60, height=10, font=text_font, bg="#F8F8F8"
         )
         self.display_bar.tag_configure("center", justify='center')
         self.display_bar.pack(fill="both", expand=True)
@@ -195,7 +195,7 @@ class AudioPlayerApp:
         """ Centers the window on the screen """
         self.root.update_idletasks()
         width = 600  # Set a fixed width
-        height = 240  # Set a fixed height
+        height = 400  # Set a fixed height
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")

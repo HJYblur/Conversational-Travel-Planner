@@ -5,16 +5,28 @@ from configure_loader import load_config
 config = load_config()
 
 
+def init_json(file_name = "ice_breaker.json"):
+    '''
+    Initialize a JSON file, this function will automatilly clean it
+    '''
+    file_path = os.path.join(config['settings']['user_path'], file_name)
+    
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump([], file, indent=4, ensure_ascii=False)
+        return True
+
+
 def append_to_json(agent_question, user_text, id):
-    data = []
+    '''
+    Append a new entry to the specified JSON file
+    '''
     file_path = os.path.join(config['settings']['user_path'], "ice_breaker.json")
 
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as file:
-            try:
-                data = json.load(file)
-            except json.JSONDecodeError:
-                data = []  
+    with open(file_path, "r", encoding="utf-8") as file:
+        try:
+            data = json.load(file)
+        except json.JSONDecodeError:
+            data = []
 
     new_entry = {
         "id": str(id),

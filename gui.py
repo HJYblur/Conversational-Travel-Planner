@@ -67,8 +67,8 @@ class AudioPlayerApp:
         self.agent_response = "Emma's response"
         self.icebreaker_question_counter = 0
         self.icebreaker_questions = [
-            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! What is your name and how old are you?",
-            f"Nice to meet you, {self.config["settings"]['user']}. Do you work, study, or a bit of both?",
+            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
+            f"Nice to meet you, {self.config['settings']['user']}. Do you work, study, or a bit of both?",
             "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
             "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
             "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",

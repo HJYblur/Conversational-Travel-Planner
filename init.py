@@ -4,6 +4,7 @@ import sounddevice as sd
 import torch
 from gui import AudioPlayerApp
 from configure_loader import load_config
+from utils import init_json
 config = load_config()
     
     
@@ -23,6 +24,9 @@ def record_init():
     # Save the updated config to the config.yaml file
     with open('config.yaml', 'w') as config_file:
         yaml.dump(config, config_file)
+        
+    # Initialize the ice_breaker.json
+    init_json("ice_breaker.json")
 
     
 def GUI_init():

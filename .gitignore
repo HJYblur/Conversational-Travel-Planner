@@ -173,5 +173,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-
+# Personal File
 .DS_Store
+
+config.yaml
+**/recording.wav

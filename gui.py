@@ -10,6 +10,7 @@ from configure_loader import load_config
 from perception import percept
 from information_retriever import retrieve
 from text_to_speech import text2speech
+from LLM.prompting import memory_query_generation, response_generation, summarization
 
 class AudioPlayerApp:
     def __init__(self, root):
@@ -93,16 +94,20 @@ class AudioPlayerApp:
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             # TODO: interpolate the summary function
+            # summarization("TODO", self.text, self.emotion) # TODO add CA question
             self.display("Summarizing the text now\n")
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory(preference)
+            # memory_query_generation("TODO", self.text, self.emotion) # TODO add CA question
             self.preference = retrieve(self.text)
-            self.state = 'GeneratingResponce'
-        elif self.state == 'GeneratingResponce':
+            self.state = 'GeneratingResponse'
+        elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            # TODO: interpolate the Responce Generation function
-            self.agent_response = f"Generating Responce of {self.text} with {self.emotion} mood, preference: {self.preference}"
+            # TODO: interpolate the Response Generation function
+            question = self.agent_response
+            self.agent_response = response_generation(question, self.text, self.emotion, self.preference)
+            # f"Generating Response of {self.text} with {self.emotion} mood, preference: {self.preference}"
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
@@ -130,9 +135,10 @@ class AudioPlayerApp:
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
             os.makedirs(user_path, exist_ok=True)
-            
-            self.display(f"Hello {user}, welcome to the travel recommendation agent!\n")
-            text2speech(f"Hello {user}, welcome to the travel recommendation agent!\n")
+
+            self.agent_response = f"Hello {user}, welcome to the travel recommendation agent!\n"
+            self.display(self.agent_response)
+            text2speech(self.agent_response)
         else:
             # If the user cancels the input dialog, close the application
             self.root.destroy()

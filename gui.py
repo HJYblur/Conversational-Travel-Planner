@@ -99,15 +99,15 @@ class AudioPlayerApp:
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory(preference)
-            # memory_query_generation("TODO", self.text, self.emotion) # TODO add CA question
-            self.preference = retrieve(self.text)
+            question = self.agent_response
+            memory_query = memory_query_generation(question, self.text, self.emotion)
+            self.preference = retrieve(memory_query)
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
             # TODO: interpolate the Response Generation function
             question = self.agent_response
             self.agent_response = response_generation(question, self.text, self.emotion, self.preference)
-            # f"Generating Response of {self.text} with {self.emotion} mood, preference: {self.preference}"
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':

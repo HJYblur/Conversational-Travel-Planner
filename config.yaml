@@ -1,11 +1,11 @@
 recording:
-  channels: 1
-  device_index: 0
-  samplerate: 48000
+  channels: 2
+  device_index: 1
+  samplerate: 44100
 settings:
   data_path: ./data
   device: cpu
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
   user: sofia
-  user_path: ./data/sofia
+  user_path: ./data\sofia

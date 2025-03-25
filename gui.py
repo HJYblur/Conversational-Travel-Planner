@@ -60,7 +60,7 @@ class AudioPlayerApp:
         self.recording = False
         self.audio_data = []
         self.text = "OvO"
-        self.emotion = "happy"
+        self.irony = False
         self.preference = "TxT"
         self.agent_response = "Emma's response"
 
@@ -84,30 +84,30 @@ class AudioPlayerApp:
         elif self.state == "Recording":
             # Wait for the user to click the "End Recording" button
             if self.end_button.config('state')[-1] == tk.DISABLED:
-                self.display(f"Ahh, {self.CA_name} get you :)")
+                self.display(f"Gotcha, give me a moment to think that through :)")
                 self.state = 'RecordFinish'
         elif self.state == 'RecordFinish':
             # Step3: Speech to Text & Emotion Detection
             self.display(f"{self.CA_name} is thinking!")
-            self.text, self.emotion = percept()
+            self.text, self.irony = percept()
             self.state = 'Summary'
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             # TODO: interpolate the summary function
-            # summarization("TODO", self.text, self.emotion) # TODO add CA question
+            # summarization("TODO", self.text, self.irony) # TODO add CA question
             self.display("Summarizing the text now\n")
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory(preference)
             question = self.agent_response
-            memory_query = memory_query_generation(question, self.text, self.emotion)
+            memory_query = memory_query_generation(question, self.text, self.irony)
             self.preference = retrieve(memory_query)
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
             # TODO: interpolate the Response Generation function
             question = self.agent_response
-            self.agent_response = response_generation(question, self.text, self.emotion, self.preference)
+            self.agent_response = response_generation(question, self.text, self.irony, self.preference)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':

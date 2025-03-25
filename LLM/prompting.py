@@ -14,20 +14,25 @@ data = {
 }
 
 
-def prompt(prompt_file_path, question, user_answer, emotion="", user_preferences=""):
-
-    user_name = load_config()['settings']['user']
-    user = f"User is {user_name}"
+def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
 
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
-    dialog = f"Dialog history:\nQuestion: {question}\nUser_answer: {user_answer}\n" 
+
+    user_name = load_config()['settings']['user']
+    user_text = f"User is {user_name}\n"
+
+    irony_text = ""
+    if irony:
+        irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialog:\n"
+    
+    dialog_history = f"Dialog history:\nQuestion: {question}\nUser_answer: {user_answer}\n" 
 
     if user_preferences:
         user_preferences = "User Preferences: " + ", ".join(user_preferences)
-        data["prompt"] = prompt_text + "\n" + user_preferences + "\n" + user + "\n" + dialog
+        data["prompt"] = prompt_text + user_text + irony_text + dialog_history + user_preferences
     else:
-        data["prompt"] = prompt_text + "\n" + user + "\n" + dialog
+        data["prompt"] = prompt_text + user_text + irony_text + dialog_history
 
     recommendation = ""
     response = requests.post(url, json=data, stream=True)
@@ -44,20 +49,20 @@ def prompt(prompt_file_path, question, user_answer, emotion="", user_preferences
     return recommendation
 
 
-def summarization(question, user_answer, emotion):
+def summarization(question, user_answer, irony):
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
 
-    return prompt(prompt_file_path, question, user_answer, emotion)
+    return prompt(prompt_file_path, question, user_answer, irony)
 
 
-def memory_query_generation(question, user_answer, emotion):
+def memory_query_generation(question, user_answer, irony):
     prompt_file_path = Path(r"LLM/Prompts/memory_query_generation.txt")
 
-    return prompt(prompt_file_path, question, user_answer, emotion)
+    return prompt(prompt_file_path, question, user_answer, irony)
 
 
-def response_generation(question, user_answer, emotion, user_preferences):
+def response_generation(question, user_answer, irony, user_preferences):
     prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
     
-    return prompt(prompt_file_path, question, user_answer, emotion, user_preferences)
+    return prompt(prompt_file_path, question, user_answer, irony, user_preferences)
 

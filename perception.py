@@ -185,6 +185,6 @@ def percept():
     # Emotion detection
     whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
     emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
-    emotion = conflict_detection(audio_path, audio)
+    irony = conflict_detection(audio_path, audio)
     
-    return text, emotion
+    return text, irony

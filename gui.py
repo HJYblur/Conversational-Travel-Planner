@@ -7,7 +7,8 @@ import wavio
 import numpy as np
 import threading
 from configure_loader import load_config
-from perception import percept
+from utils import append_to_json
+from perception import percept, retrieve_text
 from information_retriever import retrieve
 from text_to_speech import text2speech
 from LLM.prompting import memory_query_generation, response_generation, summarization
@@ -19,6 +20,7 @@ class AudioPlayerApp:
         self.config = load_config()
         self.CA_name = "Emma"
         self.center_window()
+        self.condition = 0 # 0: ice_breaker, 1: with_episodic, 2: without_episodic
 
         # Define styling options
         title_font = ("SF pro", 32, "bold")
@@ -63,6 +65,19 @@ class AudioPlayerApp:
         self.emotion = "happy"
         self.preference = "TxT"
         self.agent_response = "Emma's response"
+        self.icebreaker_question_counter = 0
+        self.icebreaker_questions = [
+            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! What is your name and how old are you?",
+            f"Nice to meet you, {self.config["settings"]['user']}. Do you work, study, or a bit of both?",
+            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
+            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
+            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
+            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
+            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
+            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
+            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
+            "I'll keep that in mind. Anything else I should know?"
+        ]
 
         # Initialize State Machine
         self.state = "Start"
@@ -75,6 +90,10 @@ class AudioPlayerApp:
             self.previous_state = self.state
         if self.state == "Start":
             self.start()
+            self.state = "IceBreaker"
+        elif self.state == "IceBreaker":
+            self.display(self.icebreaker_questions[self.icebreaker_question_counter])
+            text2speech(self.icebreaker_questions[self.icebreaker_question_counter])
             self.state = "Idle"
         elif self.state == "Idle":
         # Step2: Record the user speech
@@ -89,8 +108,18 @@ class AudioPlayerApp:
         elif self.state == 'RecordFinish':
             # Step3: Speech to Text & Emotion Detection
             self.display(f"{self.CA_name} is thinking!")
-            self.text, self.emotion = percept()
-            self.state = 'Summary'
+            # If in ice_breaker session, go back to IceBreaker
+            if self.condition == 0:
+                self.text = retrieve_text()
+                append_to_json(self.icebreaker_questions[self.icebreaker_question_counter], self.text, self.icebreaker_question_counter)
+                self.icebreaker_question_counter += 1   
+                if self.icebreaker_question_counter == 10:
+                    self.state = 'ConditionChange'
+                else:
+                    self.state = 'IceBreaker'
+            else:
+                self.text, self.emotion = percept()
+                self.state = 'Summary'
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             # TODO: interpolate the summary function
@@ -115,11 +144,21 @@ class AudioPlayerApp:
             # TODO: interpolate the Text2Speech function
             text2speech(self.agent_response)
             self.state = 'Idle'
+        elif self.state == 'ConditionChange':
+            self.condition = 1 # for now hardcoded, change it
+            self.display("Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?")
+            text2speech("Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?")
+            self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()
         
         # Schedule the next state check
         self.root.after(100, self.update)
+
+
+
+
+        
         
         
             

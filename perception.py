@@ -188,3 +188,19 @@ def percept():
     emotion = conflict_detection(audio_path, audio)
     
     return text, emotion
+
+
+def retrieve_text():
+    config = load_config()
+    
+    # Load audio
+    audio_path = os.path.join(config["settings"]["user_path"], "recording.wav")
+    audio, sr = librosa.load(audio_path, sr=16000) #sr=config["recording"]["samplerate"])
+    
+    # Transcripted text
+    model = init_speech2text_model(device=config["settings"]["device"])
+    result = model.transcribe(audio, language="en", fp16=False)
+    text = result['text']
+    print("Transcripted text: ", text)
+
+    return text

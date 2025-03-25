@@ -4,7 +4,29 @@ from event import Event
 from configure_loader import load_config
 config = load_config()
 
-    
+
+def append_to_json(agent_question, user_text, id):
+    data = []
+    file_path = os.path.join(config['settings']['user_path'], "ice_breaker.json")
+
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                data = []  
+
+    new_entry = {
+        "id": str(id),
+        "agent_question": agent_question,
+        "user_text": user_text
+    }
+
+    data.append(new_entry)
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
 
 def load_json(file_path):
     '''
@@ -32,3 +54,8 @@ def save_json(data, file_path):
     '''
     with open(os.path.join(config['settings']['user_path'], file_path), 'w') as file:
         json.dump(data, file, indent=4)
+
+
+if __name__ == "__main__":
+     memory_text = load_json('preference.json')
+     print(memory_text)

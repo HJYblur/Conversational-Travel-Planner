@@ -6,6 +6,7 @@ settings:
   data_path: ./data
   device: cpu
   k: 3
+  icebreaker_question_count: 10
   lstm_model_path: ./models/cnn_lstm.keras
   user: sofia
   user_path: ./data/sofia

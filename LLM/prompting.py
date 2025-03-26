@@ -50,15 +50,8 @@ def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
 
     return recommendation
 
-
-def summarization(question, user_answer, irony): # TODO
+def summarization(question, user_answer, irony):
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
-
-    # return prompt(prompt_file_path, question, user_answer, irony)
-
-
-def memory_query_generation(question, user_answer, irony):
-    prompt_file_path = Path(r"LLM/Prompts/memory_query_generation.txt")
 
     return prompt(prompt_file_path, question, user_answer, irony)
 

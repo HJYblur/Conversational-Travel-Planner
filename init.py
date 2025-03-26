@@ -25,8 +25,10 @@ def record_init():
     with open('config.yaml', 'w') as config_file:
         yaml.dump(config, config_file)
         
-    # Initialize the ice_breaker.json
+    # Initialize the ice_breaker.json and event.json files
     init_json("ice_breaker.json")
+    init_json("event.json") 
+
 
     
 def GUI_init():

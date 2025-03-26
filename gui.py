@@ -66,6 +66,7 @@ class AudioPlayerApp:
         self.summary = ""
         self.preference = "TxT"
         self.agent_response = "Emma's response"
+        self.event_counter = 0
         self.icebreaker_question_counter = 0
         self.icebreaker_questions = [
             "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
@@ -112,9 +113,10 @@ class AudioPlayerApp:
             # If in ice_breaker session, go back to IceBreaker
             if self.condition == 0:
                 self.text = retrieve_text()
-                append_to_json(self.icebreaker_questions[self.icebreaker_question_counter], self.text, self.icebreaker_question_counter)
+                self.summary = summarization(self.icebreaker_questions[self.icebreaker_question_counter], self.text)
+                append_to_json(self.summary, self.icebreaker_question_counter)
                 self.icebreaker_question_counter += 1   
-                if self.icebreaker_question_counter == 10:
+                if self.icebreaker_question_counter == self.config['settings']['icebreaker_question_count']:
                     self.state = 'ConditionChange'
                 else:
                     self.state = 'IceBreaker'
@@ -124,10 +126,11 @@ class AudioPlayerApp:
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             # TODO: interpolate the summary function
-            question = self.agent_response
-            self.summary = summarization(question, self.text, self.irony)
-            # store it
             self.display("Summarizing the text now\n")
+            question = self.agent_response
+            self.summary = summarization(question, self.text)
+            append_to_json(self.summary, self.event_counter, self.irony, "event.json")
+            event_counter += 1  
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
@@ -135,7 +138,6 @@ class AudioPlayerApp:
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            # TODO: interpolate the Response Generation function
             question = self.agent_response
             self.agent_response = response_generation(question, self.text, self.irony, self.preference)
             self.display(self.agent_response)
@@ -147,8 +149,9 @@ class AudioPlayerApp:
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
             self.condition = 1 # for now hardcoded, change it
-            self.display("Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?")
-            text2speech("Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?")
+            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
+            self.display(self.agent_response)
+            text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()

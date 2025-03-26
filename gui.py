@@ -11,7 +11,7 @@ from utils import append_to_json
 from perception import percept, speech2text
 from information_retriever import retrieve
 from text_to_speech import text2speech
-from LLM.prompting import memory_query_generation, response_generation, summarization
+from LLM.prompting import response_generation, summarization
 
 class AudioPlayerApp:
     def __init__(self, root):
@@ -98,7 +98,7 @@ class AudioPlayerApp:
             text2speech(self.icebreaker_questions[self.icebreaker_question_counter])
             self.state = "Idle"
         elif self.state == "Idle":
-        # Step2: Record the user speech
+            # Step2: Record the user speech
             if self.start_button.config('state')[-1] == tk.DISABLED:
                 self.state = "Recording"
                 self.display(f"{self.CA_name} is listening!")
@@ -125,8 +125,8 @@ class AudioPlayerApp:
                 self.state = 'Summary'
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
-            # TODO: interpolate the summary function
-            self.display("Summarizing the text now\n")
+            # TODO: Use the summary function without irony parameter
+            self.display(f"{self.CA_name} is summarizing your idea now :)\n")
             question = self.agent_response
             self.summary = summarization(question, self.text)
             append_to_json(self.summary, self.event_counter, self.irony, "event.json")
@@ -146,14 +146,21 @@ class AudioPlayerApp:
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
             # Step7: Convert the LLM response to speech and output to users
-            # TODO: interpolate the Text2Speech function
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
-            self.condition = 1 # for now hardcoded, change it
-            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
-            self.display(self.agent_response)
-            text2speech(self.agent_response)
+            # Change Condition from ice-breaker / with memory / without memory
+            if self.condition == 0:
+                # Convert from ice-breaker to the first stage
+                self.condition = self.config['custom']['memory_condition']
+                self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
+                self.display(self.agent_response)
+                text2speech(self.agent_response)
+            else:
+                # Convert from the first stage to the second stage
+                self.condition = 2 if self.condition == 1 else 1
+                # TODO: Add transition from the first stage the second stage
+            
             self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()
@@ -163,6 +170,13 @@ class AudioPlayerApp:
          
             
     def start(self):
+        # Initialize the with/without episodic memory
+        episodic_type = simpledialog.askstring("Set episodic type", "** ONLY controlled by researcher **")
+        if episodic_type:
+            self.config["custom"]["memory_condition"] = episodic_type
+            with open('config.yaml', 'w') as config_file:
+                yaml.dump(self.config, config_file)
+        
         user = simpledialog.askstring("User Initialization", "Please enter your name:")
         
         if user:

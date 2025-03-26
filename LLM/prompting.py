@@ -14,27 +14,21 @@ data = {
 }
 
 
-def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
-
+def build_prompt(prompt_file_path, username, dialogue, user_preferences):
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
 
-    user_name = load_config()['settings']['user']
-    user_text = f"User is {user_name}\n"
-
-    irony_text = ""
-    if irony:
-        irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialog:\n"
-    
-    dialog_history = f"Dialog history:\nQuestion: {question}User_answer: {user_answer}"
+    user_text = f"User is {username}\n"
 
     if user_preferences:
         user_preferences = "User Preferences: " + ", ".join(user_preferences)
-        data["prompt"] = prompt_text + user_text + irony_text + dialog_history + user_preferences
-    else:
-        data["prompt"] = prompt_text + user_text + irony_text + dialog_history
 
-    print(data["prompt"])
+    p = prompt_text + user_text + dialogue + user_preferences
+    #print(p)
+    return p
+
+def prompt(prompt_file_path, username, dialogue, user_preferences):
+    data["prompt"] = build_prompt(prompt_file_path, username, dialogue, user_preferences)
 
     recommendation = ""
     response = requests.post(url, json=data, stream=True)
@@ -50,14 +44,33 @@ def prompt(prompt_file_path, question, user_answer, irony, user_preferences=""):
 
     return recommendation
 
-def summarization(question, user_answer, irony):
+def get_entire_dialog_history(user_name):
+    with (open(f"../data/{user_name}/event.json", "r") as file):
+        dialogue_history = json.load(file)
+        dialogue = ""
+        irony_text = ""
+        for entry in dialogue_history:
+            if entry['irony']:
+                irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialogue:"
+            question = f"Question: {entry['question']}"
+            user_answer = f"User_answer: {entry['user_answer']}"
+            dialogue += f"{irony_text}\n{question}\n{user_answer}\n"
+
+    return dialogue
+
+def get_last_utterances(question, user_answer):
+    return f"Question: {question}\nUser_answer: {user_answer}"
+
+def summarization(question, user_answer):
+    username = load_config()['settings']['user']
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
+    dialogue = get_last_utterances(question, user_answer)
+    #print(dialogue)
+    return prompt(prompt_file_path, username, dialogue, "")
 
-    return prompt(prompt_file_path, question, user_answer, irony)
-
-
-def response_generation(question, user_answer, irony, user_preferences):
+def response_generation(user_preferences):
+    username = load_config()['settings']['user']
     prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
-    
-    return prompt(prompt_file_path, question, user_answer, irony, user_preferences)
-
+    dialogue = get_entire_dialog_history(username)
+    #print(dialogue)
+    return prompt(prompt_file_path, username, dialogue, user_preferences)

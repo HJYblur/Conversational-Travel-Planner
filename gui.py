@@ -141,7 +141,7 @@ class AudioPlayerApp:
             # Step6: Communicate with LLM to generate the response
             # TODO: Use both preference and event to generate response
             question = self.agent_response
-            self.agent_response = response_generation(question, self.text, self.irony, self.preference)
+            self.agent_response = response_generation(self.preference)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':

@@ -20,7 +20,7 @@ class AudioPlayerApp:
         self.config = load_config()
         self.CA_name = "Emma"
         self.center_window()
-        self.condition = 0 # 0: ice_breaker, 1: with_episodic, 2: without_episodic
+        self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
 
         # Define styling options
         title_font = ("SF pro", 32, "bold")
@@ -130,8 +130,11 @@ class AudioPlayerApp:
             question = self.agent_response
             self.summary = summarization(question, self.text)
             append_to_json(self.summary, self.event_counter, self.irony, "event.json")
-            event_counter += 1  
-            self.state = 'retrieval'
+            self.event_counter += 1
+            if self.condition == 1: # with memory
+                self.state = 'retrieval' 
+            else: # without memory
+                self.state = 'GeneratingResponse'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
             self.preference = retrieve(self.summary, "preference") # memory_type = 'preference' or 'event'

@@ -2,7 +2,7 @@ import torch
 import faiss
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
-from utils import load_json
+from utils import load_json, get_json_size
 from configure_loader import load_config
 
 
@@ -59,16 +59,16 @@ def faiss_search(memory, query, k = 3):
     return indices[0]
 
 
-def retrieve(query_text):
+def retrieve(query_text, memory_type):
     config = load_config()
     init_retrieve_model()
     
     query = embed_text(query_text, retrieve_model, tokenizer) 
-    memory_text = load_json('preference.json') # if memory_type == 'preference' else load_event_json('event.json')
+    memory_text = load_json(memory_type) # memory_type == 'preference' or 'event'
     memory = embed_texts(memory_text, retrieve_model, tokenizer)
     
     # Search k nearest memory (kNN search)
-    k = config['settings']['k']
+    k = min(config['settings']['k'], get_json_size(memory_type))
     indices = faiss_search(memory, query, k)
     output = [memory_text[indices[i]] for i in range(k)]
     print(f"Query: {query_text}, Output: {output}")

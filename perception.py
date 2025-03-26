@@ -190,7 +190,7 @@ def percept():
     return text, irony
 
 
-def retrieve_text():
+def speech2text():
     config = load_config()
     
     # Load audio

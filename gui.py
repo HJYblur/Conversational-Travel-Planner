@@ -8,7 +8,7 @@ import numpy as np
 import threading
 from configure_loader import load_config
 from utils import append_to_json
-from perception import percept, retrieve_text
+from perception import percept, speech2text
 from information_retriever import retrieve
 from text_to_speech import text2speech
 from LLM.prompting import memory_query_generation, response_generation, summarization
@@ -112,7 +112,7 @@ class AudioPlayerApp:
             self.display(f"{self.CA_name} is thinking!")
             # If in ice_breaker session, go back to IceBreaker
             if self.condition == 0:
-                self.text = retrieve_text()
+                self.text = speech2text()
                 self.summary = summarization(self.icebreaker_questions[self.icebreaker_question_counter], self.text)
                 append_to_json(self.summary, self.icebreaker_question_counter)
                 self.icebreaker_question_counter += 1   

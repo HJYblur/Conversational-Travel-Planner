@@ -1,6 +1,7 @@
 import os
 import json
 from event import Event
+from preference import Preference
 from configure_loader import load_config
 config = load_config()
 
@@ -47,36 +48,24 @@ def append_to_json(summarized_tuple, id, irony=False, file_name = "ice_breaker.j
         json.dump(data, file, indent=4, ensure_ascii=False)
 
 
-def load_json(file_path):
-    '''
-    Load a JSON file from the given file path and return a list
-    '''
-    with open(os.path.join(config['settings']['user_path'], file_path), 'r') as file:
-        data = json.load(file)
-    return list(data.values())
 
-
-def load_event_json(file_path = "event.json"):
+def load_json(memory_type):
     '''
     Load a JSON file which is a list
     '''
+    file_path = "event.json" if memory_type == "event" else  "ice_breaker.json"
     with open(os.path.join(config['settings']['user_path'], file_path), 'r') as file:
-        events_data = json.load(file)
+        data = json.load(file)
 
-    # Convert JSON data to Event instances
-    return [Event.from_dict(event).extract() for event in events_data]
-
-
-def save_json(data, file_path):
-    '''
-    Save a JSON file to the given file path
-    '''
-    with open(os.path.join(config['settings']['user_path'], file_path), 'w') as file:
-        json.dump(data, file, indent=4)
+    # Convert JSON data to Event/Preference instances
+    if memory_type == 'event':
+        return [Event.from_dict(event).extract() for event in data]
+    else:
+        return [Preference.from_dict(pref).extract() for pref in data]
 
 
-if __name__ == "__main__":
-    #  memory_text = load_json('preference.json')
-    #  print(memory_text)
-    init_json()
-    append_to_json("hey hey hey", 1, False)
+def get_json_size(memory_type):
+    file_path = "event.json" if memory_type == "event" else  "ice_breaker.json"
+    with open(os.path.join(config['settings']['user_path'], file_path), 'r') as file:
+        data = json.load(file)
+        return len(data)

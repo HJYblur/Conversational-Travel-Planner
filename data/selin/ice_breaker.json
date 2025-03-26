@@ -1,6 +1,17 @@
 [
     {
         "id": "1",
-        "summarized_tuple": "hey hey hey"
+        "summarized_tuple": "hey hey hey",
+        "irony": false
+    },
+    {
+        "id": "2",
+        "summarized_tuple": "Ofgasdfghiaslkgnsklafgg",
+        "irony": false
+    },
+    {
+        "id": "3",
+        "summarized_tuple": "GAFG;LEJLGwog",
+        "irony": true
     }
 ]

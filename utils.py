@@ -16,11 +16,11 @@ def init_json(file_name = "ice_breaker.json"):
         return True
 
 
-def append_to_json(agent_question, user_text, id):
+def append_to_json(summarized_tuple, id, irony=False, file_name = "ice_breaker.json"):
     '''
     Append a new entry to the specified JSON file
     '''
-    file_path = os.path.join(config['settings']['user_path'], "ice_breaker.json")
+    file_path = os.path.join(config['settings']['user_path'],file_name)
 
     with open(file_path, "r", encoding="utf-8") as file:
         try:
@@ -28,11 +28,18 @@ def append_to_json(agent_question, user_text, id):
         except json.JSONDecodeError:
             data = []
 
-    new_entry = {
-        "id": str(id),
-        "agent_question": agent_question,
-        "user_text": user_text
-    }
+    if file_name == "ice_breaker.json":
+        new_entry = {
+            "id": str(id),
+            "summarized_tuple": summarized_tuple,
+        }
+
+    else:
+        new_entry = {
+            "id": str(id),
+            "summarized_tuple": summarized_tuple,
+            "irony": irony,
+        }
 
     data.append(new_entry)
 
@@ -69,5 +76,7 @@ def save_json(data, file_path):
 
 
 if __name__ == "__main__":
-     memory_text = load_json('preference.json')
-     print(memory_text)
+    #  memory_text = load_json('preference.json')
+    #  print(memory_text)
+    init_json()
+    append_to_json("hey hey hey", 1, False)

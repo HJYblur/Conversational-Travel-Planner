@@ -1,12 +1,12 @@
 recording:
   channels: 1
   device_index: 0
-  samplerate: 24000
+  samplerate: 48000
 settings:
   data_path: ./data
   device: cpu
   icebreaker_question_count: 10
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
-  user: lemon
-  user_path: ./data/lemon
+  user: selin
+  user_path: ./data/selin

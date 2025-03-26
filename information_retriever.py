@@ -64,7 +64,7 @@ def retrieve(query_text, memory_type):
     init_retrieve_model()
     
     query = embed_text(query_text, retrieve_model, tokenizer) 
-    memory_text = load_json(memory_type) # memory_type == 'preference' or 'event'
+    memory_text = load_json(memory_type) # memory_type = 'preference' or 'event'
     memory = embed_texts(memory_text, retrieve_model, tokenizer)
     
     # Search k nearest memory (kNN search)

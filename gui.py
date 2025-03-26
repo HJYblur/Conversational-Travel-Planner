@@ -134,10 +134,12 @@ class AudioPlayerApp:
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
-            self.preference = retrieve(self.summary)
+            self.preference = retrieve(self.summary, "preference") # memory_type = 'preference' or 'event'
+            self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
+            # TODO: Use both preference and event to generate response
             question = self.agent_response
             self.agent_response = response_generation(question, self.text, self.irony, self.preference)
             self.display(self.agent_response)

@@ -52,6 +52,7 @@ def get_entire_dialog_history(user_name):
         for entry in dialogue_history:
             if entry['irony']:
                 irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialogue:"
+            # TODO use summarized_tuple instead
             question = f"Question: {entry['question']}"
             user_answer = f"User_answer: {entry['user_answer']}"
             dialogue += f"{irony_text}\n{question}\n{user_answer}\n"

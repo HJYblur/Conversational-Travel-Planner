@@ -125,10 +125,10 @@ class AudioPlayerApp:
                 self.state = 'Summary'
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
-            # TODO: Use the summary function without irony parameter
             self.display(f"{self.CA_name} is summarizing your idea now :)\n")
             question = self.agent_response
             self.summary = summarization(question, self.text)
+            # TODO: Clear the events file after condition changes between 1-2
             append_to_json(self.summary, self.event_counter, self.irony, "event.json")
             self.event_counter += 1
             if self.condition == 1: # with memory
@@ -138,13 +138,15 @@ class AudioPlayerApp:
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
             self.preference = retrieve(self.summary, "preference") # memory_type = 'preference' or 'event'
-            self.event = retrieve(self.summary, "event")
+            # self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            # TODO: Use both preference and event to generate response
-            question = self.agent_response
-            self.agent_response = response_generation(self.preference)
+            if self.condition == 1: # with memory
+                self.agent_response = response_generation(self.preference)
+            else: # without memory
+                # TODO: Change response generation logic
+                self.agent_response = response_generation(self.preference)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':

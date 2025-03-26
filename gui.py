@@ -63,6 +63,7 @@ class AudioPlayerApp:
         self.audio_data = []
         self.text = "OvO"
         self.irony = False
+        self.summary = ""
         self.preference = "TxT"
         self.agent_response = "Emma's response"
         self.icebreaker_question_counter = 0
@@ -123,14 +124,14 @@ class AudioPlayerApp:
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             # TODO: interpolate the summary function
-            # summarization("TODO", self.text, self.irony) # TODO add CA question
+            question = self.agent_response
+            self.summary = summarization(question, self.text, self.irony)
+            # store it
             self.display("Summarizing the text now\n")
             self.state = 'retrieval'
         elif self.state == 'retrieval':
-            # Step5: Information retrieval from long-term memory(preference)
-            question = self.agent_response
-            memory_query = memory_query_generation(question, self.text, self.irony)
-            self.preference = retrieve(memory_query)
+            # Step5: Information retrieval from long-term memory
+            self.preference = retrieve(self.summary)
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response

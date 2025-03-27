@@ -21,7 +21,8 @@ class AudioPlayerApp:
         self.config = load_config()
         self.CA_name = "Emma"
         self.center_window()
-        self.condition = 0 # 0: ice_breaker, 1: with_episodic, 2: without_episodic
+        self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
+        self.end_experiment = False # When True experiment will end after the following round
 
         # Define styling options
         title_font = ("SF pro", 32, "bold")
@@ -126,13 +127,16 @@ class AudioPlayerApp:
                 self.state = 'Summary'
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
-            # TODO: Use the summary function without irony parameter
             self.display(f"{self.CA_name} is summarizing your idea now :)\n")
             question = self.agent_response
             self.summary = summarization(question, self.text)
+            # TODO: Clear the events file after condition changes between 1-2
             append_to_json(self.summary, self.event_counter, self.irony, "event.json")
-            event_counter += 1  
-            self.state = 'retrieval'
+            self.event_counter += 1
+            if self.condition == 1: # with memory
+                self.state = 'retrieval' 
+            else: # without memory
+                self.state = 'GeneratingResponse'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
             self.ice_breaker = retrieve(self.summary, "ice_breaker") # memory_type = 'ice_breaker' or 'event'
@@ -140,9 +144,7 @@ class AudioPlayerApp:
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            # TODO: Use both ice_breaker and event to generate response
-            question = self.agent_response
-            self.agent_response = response_generation(question, self.text, self.irony, self.ice_breaker)
+            self.agent_response = response_generation(self.ice_breaker)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
@@ -150,6 +152,11 @@ class AudioPlayerApp:
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
+            # Check wether all conditions have been performed 
+            if self.end_experiment:
+                self.state == "Stopped"
+            else:
+                self.state = 'Idle'
             # Change Condition from ice-breaker / with memory / without memory
             if self.condition == 0:
                 # Convert from ice-breaker to the first stage
@@ -160,9 +167,9 @@ class AudioPlayerApp:
             else:
                 # Convert from the first stage to the second stage
                 self.condition = 2 if self.condition == 1 else 1
+                self.end_experiment = True
                 # TODO: Add transition from the first stage the second stage
-            
-            self.state = 'Idle'
+
         elif self.state == "Stopped":
             self.on_closing()
         

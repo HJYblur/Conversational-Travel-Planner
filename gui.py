@@ -11,6 +11,7 @@ from utils import append_to_json
 from perception import percept, speech2text
 from information_retriever import retrieve
 from text_to_speech import text2speech
+from utils import init_json
 from LLM.prompting import response_generation, summarization
 
 class AudioPlayerApp:
@@ -64,7 +65,7 @@ class AudioPlayerApp:
         self.text = "OvO"
         self.irony = False
         self.summary = ""
-        self.preference = "TxT"
+        self.ice_breaker = "TxT"
         self.agent_response = "Emma's response"
         self.event_counter = 0
         self.icebreaker_question_counter = 0
@@ -134,14 +135,14 @@ class AudioPlayerApp:
             self.state = 'retrieval'
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
-            self.preference = retrieve(self.summary, "preference") # memory_type = 'preference' or 'event'
+            self.ice_breaker = retrieve(self.summary, "ice_breaker") # memory_type = 'ice_breaker' or 'event'
             self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            # TODO: Use both preference and event to generate response
+            # TODO: Use both ice_breaker and event to generate response
             question = self.agent_response
-            self.agent_response = response_generation(question, self.text, self.irony, self.preference)
+            self.agent_response = response_generation(question, self.text, self.irony, self.ice_breaker)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
@@ -180,7 +181,7 @@ class AudioPlayerApp:
         user = simpledialog.askstring("User Initialization", "Please enter your name:")
         
         if user:
-            # Initialize the data directory
+            # Initialize the data directory in configuration
             root_path = self.config['settings']['data_path']
             user_path = os.path.join(root_path, user)
             self.config["settings"]['user'] = user
@@ -188,6 +189,10 @@ class AudioPlayerApp:
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
             os.makedirs(user_path, exist_ok=True)
+            
+            # Initialize the ice_breaker.json and event.json files in the user folder
+            init_json("ice_breaker.json")
+            init_json("event.json") 
 
             self.agent_response = f"Hello {user}, welcome to the travel recommendation agent!\n"
             self.display(self.agent_response)

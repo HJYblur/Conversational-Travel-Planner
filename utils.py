@@ -1,7 +1,7 @@
 import os
 import json
 from event import Event
-from preference import Preference
+from ice_breaker import Ice_breaker
 from configure_loader import load_config
 config = load_config()
 
@@ -57,11 +57,11 @@ def load_json(memory_type):
     with open(os.path.join(config['settings']['user_path'], file_path), 'r') as file:
         data = json.load(file)
 
-    # Convert JSON data to Event/Preference instances
+    # Convert JSON data to Event/Ice_breaker instances
     if memory_type == 'event':
         return [Event.from_dict(event).extract() for event in data]
     else:
-        return [Preference.from_dict(pref).extract() for pref in data]
+        return [Ice_breaker.from_dict(pref).extract() for pref in data]
 
 
 def get_json_size(memory_type):

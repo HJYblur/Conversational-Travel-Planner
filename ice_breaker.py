@@ -1,4 +1,4 @@
-class Preference:
+class Ice_breaker:
     '''
     eg: "id": str(id),
         "summarized_tuple": summarized_tuple,
@@ -21,7 +21,7 @@ class Preference:
         )
         
     def __str__(self):
-        str = f'Preference {self.id}: , summarized_tuple: {self.summarized_tuple}'
+        str = f'Ice_breaker {self.id}: , summarized_tuple: {self.summarized_tuple}'
         return str
     
     def extract(self):

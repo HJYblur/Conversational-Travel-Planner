@@ -43,7 +43,7 @@ def embed_texts(texts, retrieve_model, tokenizer):
 def faiss_search(memory, query, k = 3):
     '''
     Query comes from the context, which might be key words extraction from the conversation
-    Then we retrieve the preference from the long-term memory, and the event from the short-term memory
+    Then we retrieve the ice_breaker from the long-term memory, and the event from the short-term memory
     Ref: https://medium.com/loopio-tech/how-to-use-faiss-to-build-your-first-similarity-search-bf0f708aa772
     '''
     # Normalize the vectors
@@ -64,7 +64,7 @@ def retrieve(query_text, memory_type):
     init_retrieve_model()
     
     query = embed_text(query_text, retrieve_model, tokenizer) 
-    memory_text = load_json(memory_type) # memory_type = 'preference' or 'event'
+    memory_text = load_json(memory_type) # memory_type = 'ice_breaker' or 'event'
     memory = embed_texts(memory_text, retrieve_model, tokenizer)
     
     # Search k nearest memory (kNN search)

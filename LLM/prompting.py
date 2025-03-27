@@ -44,18 +44,17 @@ def prompt(prompt_file_path, username, dialogue, user_preferences):
 
     return recommendation
 
-def get_entire_dialog_history(user_name):
+def get_entire_dialogue_history(user_name):
     with (open(f"../data/{user_name}/event.json", "r") as file):
         dialogue_history = json.load(file)
         dialogue = ""
         irony_text = ""
         for entry in dialogue_history:
             if entry['irony']:
-                irony_text = "Keep in mind that the user is being ironic when answering the question in the following dialogue:"
-            # TODO use summarized_tuple instead
-            question = f"Question: {entry['question']}"
-            user_answer = f"User_answer: {entry['user_answer']}"
-            dialogue += f"{irony_text}\n{question}\n{user_answer}\n"
+                irony_text = "Keep in mind that the user is being ironic in the following sentence:"
+            summary = f"Dialogue: {entry['summarized_tuple']}"
+
+            dialogue += f"{irony_text}\n{summary}\n"
 
     return dialogue
 
@@ -71,7 +70,11 @@ def summarization(question, user_answer):
 
 def response_generation(user_preferences):
     username = load_config()['settings']['user']
-    prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
-    dialogue = get_entire_dialog_history(username)
-    #print(dialogue)
+    dialogue = get_entire_dialogue_history(username)
+    # print(dialogue)
+    if user_preferences:
+        prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
+    else:
+        prompt_file_path = Path(r"LLM/Prompts/response_generation.txt") # TODO change the prompt
+
     return prompt(prompt_file_path, username, dialogue, user_preferences)

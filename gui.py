@@ -21,6 +21,7 @@ class AudioPlayerApp:
         self.CA_name = "Emma"
         self.center_window()
         self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
+        self.end_experiment = False # When True experiment will end after the following round
 
         # Define styling options
         title_font = ("SF pro", 32, "bold")
@@ -150,6 +151,11 @@ class AudioPlayerApp:
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
+            # Check wether all conditions have been performed 
+            if self.end_experiment:
+                self.state == "Stopped"
+            else:
+                self.state = 'Idle'
             # Change Condition from ice-breaker / with memory / without memory
             if self.condition == 0:
                 # Convert from ice-breaker to the first stage
@@ -160,9 +166,9 @@ class AudioPlayerApp:
             else:
                 # Convert from the first stage to the second stage
                 self.condition = 2 if self.condition == 1 else 1
+                self.end_experiment = True
                 # TODO: Add transition from the first stage the second stage
-            
-            self.state = 'Idle'
+
         elif self.state == "Stopped":
             self.on_closing()
         

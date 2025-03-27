@@ -44,7 +44,7 @@ def prompt(prompt_file_path, username, dialogue, user_preferences):
 
     return recommendation
 
-def get_entire_dialogue_history(user_name, entire_dialogue_bool):
+def get_dialogue_history(user_name, entire_dialogue_bool):
     with (open(f"../data/{user_name}/event.json", "r") as file):
         dialogue_history = json.load(file)
         if(not entire_dialogue_bool):
@@ -74,10 +74,10 @@ def response_generation(user_preferences):
     username = load_config()['settings']['user']
 
     if user_preferences: # memory condition
-        dialogue = get_entire_dialogue_history(username, True)
+        dialogue = get_dialogue_history(username, True)
         prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
     else: # no memory condition
-        dialogue = get_entire_dialogue_history(username, False)
+        dialogue = get_dialogue_history(username, False)
         prompt_file_path = Path(r"LLM/Prompts/response_generation.txt") # TODO change the prompt
 
     # print(dialogue)

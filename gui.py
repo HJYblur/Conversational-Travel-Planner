@@ -96,22 +96,29 @@ class AudioPlayerApp:
             self.start()
             self.state = "IceBreaker"
         elif self.state == "IceBreaker":
-            self.display(self.icebreaker_questions[self.icebreaker_question_counter])
+            # self.display(self.icebreaker_questions[self.icebreaker_question_counter]) #TODO///before///
+            self.agent_response = self.icebreaker_questions[self.icebreaker_question_counter] #TODO///M///
+            self.display(self.agent_response) #TODO///M///
+            self.display_bar.update_idletasks()  # TODO///M///
             text2speech(self.icebreaker_questions[self.icebreaker_question_counter])
             self.state = "Idle"
         elif self.state == "Idle":
             # Step2: Record the user speech
             if self.start_button.config('state')[-1] == tk.DISABLED:
                 self.state = "Recording"
-                self.display(f"{self.CA_name} is listening!")
+                # self.display(f"{self.CA_name} is listening!") # before
+                self.display(self.agent_response)
+                self.display_bar.update_idletasks()
         elif self.state == "Recording":
             # Wait for the user to click the "End Recording" button
             if self.end_button.config('state')[-1] == tk.DISABLED:
                 self.display(f"Gotcha, give me a moment to think that through :)")
+                self.display_bar.update_idletasks()
                 self.state = 'RecordFinish'
         elif self.state == 'RecordFinish':
             # Step3: Speech to Text & Emotion Detection
             self.display(f"{self.CA_name} is thinking!")
+            self.display_bar.update_idletasks()
             # If in ice_breaker session, go back to IceBreaker
             if self.condition == 0:
                 self.text = speech2text()
@@ -128,6 +135,7 @@ class AudioPlayerApp:
         elif self.state == 'Summary':
             # Step4: Summarize short-term memory from the text
             self.display(f"{self.CA_name} is summarizing your idea now :)\n")
+            self.display_bar.update_idletasks()
             question = self.agent_response
             self.summary = summarization(question, self.text)
             # TODO: Clear the events file after condition changes between 1-2
@@ -146,9 +154,12 @@ class AudioPlayerApp:
             # Step6: Communicate with LLM to generate the response
             self.agent_response = response_generation(self.ice_breaker)
             self.display(self.agent_response)
+            self.display_bar.update_idletasks()  # TODO///M///
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
             # Step7: Convert the LLM response to speech and output to users
+            self.display(self.agent_response)  #TODO///M///
+            self.display_bar.update_idletasks()  # TODO///M///
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
@@ -163,6 +174,7 @@ class AudioPlayerApp:
                 self.condition = self.config['custom']['memory_condition']
                 self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
                 self.display(self.agent_response)
+                self.display_bar.update_idletasks()  # TODO///M///
                 text2speech(self.agent_response)
             else:
                 # Convert from the first stage to the second stage
@@ -203,6 +215,7 @@ class AudioPlayerApp:
 
             self.agent_response = f"Hello {user}, welcome to the travel recommendation agent!\n"
             self.display(self.agent_response)
+            self.display_bar.update_idletasks() #TODO///M///
             text2speech(self.agent_response)
         else:
             # If the user cancels the input dialog, close the application

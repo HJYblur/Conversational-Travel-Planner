@@ -1,9 +1,9 @@
 custom:
-  memory_condition: '1'
+  memory_condition: '2'
 recording:
   channels: 1
-  device_index: 4
-  samplerate: 48000
+  device_index: 0
+  samplerate: 24000
 settings:
   data_path: ./data
   device: cpu

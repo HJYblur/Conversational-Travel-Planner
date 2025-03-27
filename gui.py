@@ -64,7 +64,7 @@ class AudioPlayerApp:
         self.text = "OvO"
         self.irony = False
         self.summary = ""
-        self.preference = "TxT"
+        self.preference = ""
         self.agent_response = "Emma's response"
         self.event_counter = 0
         self.icebreaker_question_counter = 0
@@ -142,11 +142,7 @@ class AudioPlayerApp:
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            if self.condition == 1: # with memory
-                self.agent_response = response_generation(self.preference)
-            else: # without memory
-                # TODO: Change response generation logic
-                self.agent_response = response_generation(self.preference)
+            self.agent_response = response_generation(self.preference)
             self.display(self.agent_response)
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':

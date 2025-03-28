@@ -22,6 +22,7 @@ class AudioPlayerApp:
         self.CA_name = "Emma"
         self.center_window()
         self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
+        # self.session_counter = 0 # 1: session 1, 2: session 2
         self.end_experiment = False # When True experiment will end after the following round
 
         # Define styling options
@@ -51,11 +52,17 @@ class AudioPlayerApp:
         audio_frame = tk.Frame(root, pady=10)
         audio_frame.pack()
 
-        self.start_button = tk.Button(audio_frame, text="Start Recording", font=btn_font, command=self.start_recording, bg="#4CAF50")
-        self.end_button = tk.Button(audio_frame, text="End Recording", font=btn_font, command=self.stop_recording, bg="#F44336", state=tk.DISABLED)
+        self.start_button = tk.Button(audio_frame, text="Start Talking", font=btn_font, command=self.start_recording, bg="#4CAF50")
+        self.end_button = tk.Button(audio_frame, text="End Talking", font=btn_font, command=self.stop_recording, bg="#F44336", state=tk.DISABLED)
+        self.end_session_button = tk.Button(audio_frame, text="End Session", font=btn_font, command=self.next_session, bg="#FF9800")
 
-        self.start_button.grid(row=0, column=0, padx=10, pady=5)
-        self.end_button.grid(row=0, column=1, padx=10, pady=5)
+        audio_frame.columnconfigure(0, weight=1)
+        audio_frame.columnconfigure(1, weight=1)
+        audio_frame.columnconfigure(2, weight=1)
+
+        self.start_button.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
+        self.end_button.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
+        self.end_session_button.grid(row=0, column=2, padx=10, pady=5, sticky="ew")
 
         # Closing Protocol
         root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -86,7 +93,6 @@ class AudioPlayerApp:
         # Initialize State Machine
         self.state = "Start"
         self.update()
-        
 
     def update(self):
         if not hasattr(self, 'previous_state') or self.state != self.previous_state:
@@ -163,32 +169,19 @@ class AudioPlayerApp:
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == 'ConditionChange':
-            # Check wether all conditions have been performed 
-            if self.end_experiment:
-                self.state == "Stopped"
-            else:
-                self.state = 'Idle'
-            # Change Condition from ice-breaker / with memory / without memory
-            if self.condition == 0:
-                # Convert from ice-breaker to the first stage
-                self.condition = self.config['custom']['memory_condition']
-                self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
-                self.display(self.agent_response)
-                self.display_bar.update_idletasks()  # TODO///M///
-                text2speech(self.agent_response)
-            else:
-                # Convert from the first stage to the second stage
-                self.condition = 2 if self.condition == 1 else 1
-                self.end_experiment = True
-                # TODO: Add transition from the first stage the second stage
-
+            # Convert from ice-breaker to the first stage
+            self.condition = self.config['custom']['memory_condition']
+            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
+            self.display(self.agent_response)
+            self.display_bar.update_idletasks()  # TODO///M///
+            text2speech(self.agent_response)
+            self.state = 'Idle'
         elif self.state == "Stopped":
             self.on_closing()
-        
+
         # Schedule the next state check
         self.root.after(100, self.update)
-         
-            
+
     def start(self):
         # Initialize the with/without episodic memory
         episodic_type = simpledialog.askstring("Set episodic type", "** ONLY controlled by researcher **")
@@ -196,9 +189,9 @@ class AudioPlayerApp:
             self.config["custom"]["memory_condition"] = episodic_type
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
-        
+
         user = simpledialog.askstring("User Initialization", "Please enter your name:")
-        
+
         if user:
             # Initialize the data directory in configuration
             root_path = self.config['settings']['data_path']
@@ -208,7 +201,7 @@ class AudioPlayerApp:
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
             os.makedirs(user_path, exist_ok=True)
-            
+
             # Initialize the ice_breaker.json and event.json files in the user folder
             init_json("ice_breaker.json")
             init_json("event.json") 
@@ -221,6 +214,22 @@ class AudioPlayerApp:
             # If the user cancels the input dialog, close the application
             self.root.destroy()
             
+    def next_session(self):
+        if self.condition == 0:
+            self.display("No responce during the ice-breaker session")
+            return
+        
+        if self.end_experiment:
+            self.display("Thank you for participating in the experiment! :)")
+            self.state == "Stopped"
+            self.update()
+        else:
+            self.condition = 2 if self.condition == 1 else 1
+            self.display("Session 1 ended. Before we start the next session, please fill in the questionnaire :)")
+            # TODO: add the transition sentence from session 1 to session 2
+            self.end_experiment = True
+            self.state = "Idle"
+            self.update()
 
     def start_recording(self):
         if not self.recording:
@@ -243,7 +252,6 @@ class AudioPlayerApp:
             self.start_button.config(state=tk.DISABLED)
             self.end_button.config(state=tk.NORMAL)
             self.display("Recording started...\n", True)
-            
 
     def stop_recording(self):
         self.recording = False
@@ -258,8 +266,7 @@ class AudioPlayerApp:
             self.start_button.config(state=tk.NORMAL)
             self.end_button.config(state=tk.DISABLED)
             # self.display(f"Recording saved to {audio_path}\n", True)
-            
-            
+
     def display(self, text="", rewrite=True):
         """ Updates the display bar with new text """
         self.display_bar.config(state="normal")
@@ -267,7 +274,6 @@ class AudioPlayerApp:
             self.display_bar.delete(1.0, tk.END)
         self.display_bar.insert(tk.END, text + "\n", "center")
         self.display_bar.config(state="disabled")
-
 
     def center_window(self):
         """ Centers the window on the screen """
@@ -277,7 +283,6 @@ class AudioPlayerApp:
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
-        
-        
+
     def on_closing(self):
         self.root.destroy()

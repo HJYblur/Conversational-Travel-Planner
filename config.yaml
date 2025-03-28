@@ -1,5 +1,5 @@
 custom:
-  memory_condition: '2'
+  memory_condition: '1'
 recording:
   channels: 1
   device_index: 0

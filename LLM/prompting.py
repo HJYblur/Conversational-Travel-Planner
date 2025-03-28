@@ -45,7 +45,7 @@ def prompt(prompt_file_path, username, dialogue, user_preferences):
     return recommendation
 
 def get_dialogue_history(user_name, entire_dialogue_bool):
-    with (open(f"../data/{user_name}/event.json", "r") as file):
+    with (open(f"./data/{user_name}/event.json", "r") as file):
         dialogue_history = json.load(file)
         if(not entire_dialogue_bool):
             dialogue_history = dialogue_history[-1]

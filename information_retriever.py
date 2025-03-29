@@ -61,7 +61,6 @@ def faiss_search(memory, query, k = 3):
 
 def retrieve(query_text, memory_type):
     config = load_config()
-    init_retrieve_model()
     
     query = embed_text(query_text, retrieve_model, tokenizer) 
     memory_text = load_json(memory_type) # memory_type = 'ice_breaker' or 'event'

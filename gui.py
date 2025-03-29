@@ -194,7 +194,7 @@ class AudioPlayerApp:
 
         if user:
             # Initialize the data directory in configuration
-            root_path = self.config['settings']['data_path']
+            root_path = './data'
             user_path = os.path.join(root_path, user)
             self.config["settings"]['user'] = user
             self.config['settings']['user_path'] = user_path

@@ -177,14 +177,14 @@ def percept():
     audio, sr = librosa.load(audio_path, sr=16000) #sr=config["recording"]["samplerate"])
     
     # Transcripted text
-    model = init_speech2text_model(device=config["settings"]["device"])
-    result = model.transcribe(audio, language="en", fp16=False)
+    # speech2text_model = init_speech2text_model(device=config["settings"]["device"])
+    result = speech2text_model.transcribe(audio, language="en", fp16=False)
     text = result['text']
     print("Transcripted text: ", text)
     
     # Emotion detection
-    whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
-    emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
+    # whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
+    # emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
     irony = conflict_detection(audio_path, audio)
     
     return text, irony
@@ -198,8 +198,8 @@ def speech2text():
     audio, sr = librosa.load(audio_path, sr=16000) #sr=config["recording"]["samplerate"])
     
     # Transcripted text
-    model = init_speech2text_model(device=config["settings"]["device"])
-    result = model.transcribe(audio, language="en", fp16=False)
+    # speech2text_model = init_speech2text_model(device=config["settings"]["device"])
+    result = speech2text_model.transcribe(audio, language="en", fp16=False)
     text = result['text']
     print("Transcripted text: ", text)
 

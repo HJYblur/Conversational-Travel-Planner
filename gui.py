@@ -77,18 +77,6 @@ class AudioPlayerApp:
         self.agent_response = "Emma's response"
         self.event_counter = 0
         self.icebreaker_question_counter = 0
-        self.icebreaker_questions = [
-            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
-            f"Nice to meet you, {self.config['settings']['user']}. Do you work, study, or a bit of both?",
-            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
-            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
-            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
-            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
-            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
-            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
-            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
-            "I'll keep that in mind. Anything else I should know?"
-        ]
 
         # Initialize State Machine
         self.state = "Start"
@@ -191,13 +179,13 @@ class AudioPlayerApp:
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
 
-        user = simpledialog.askstring("User Initialization", "Please enter your name:")
+        self.user = simpledialog.askstring("User Initialization", "Please enter your name:")
 
-        if user:
+        if self.user:
             # Initialize the data directory in configuration
             root_path = './data'
-            user_path = os.path.join(root_path, user)
-            self.config["settings"]['user'] = user
+            user_path = os.path.join(root_path, self.user)
+            self.config["settings"]['user'] = self.user
             self.config['settings']['user_path'] = user_path
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
@@ -207,10 +195,13 @@ class AudioPlayerApp:
             init_json("ice_breaker.json")
             init_json("event.json") 
 
-            self.agent_response = f"Hello {user}, welcome to the travel recommendation agent!\n"
+            self.agent_response = f"Hello {self.user}, welcome to the travel recommendation agent!\n"
             self.display(self.agent_response)
             self.display_bar.update_idletasks() #TODO///M///
             text2speech(self.agent_response)
+            
+            # Initialize the icebreaker questions
+            self.init_icebreaker()
         else:
             # If the user cancels the input dialog, close the application
             self.root.destroy()
@@ -267,6 +258,20 @@ class AudioPlayerApp:
             self.start_button.config(state=tk.NORMAL)
             self.end_button.config(state=tk.DISABLED)
             # self.display(f"Recording saved to {audio_path}\n", True)
+            
+    def init_icebreaker(self):
+        self.icebreaker_questions = [
+            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
+            f"Nice to meet you, {self.user}. Do you work, study, or a bit of both?",
+            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
+            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
+            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
+            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
+            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
+            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
+            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
+            "I'll keep that in mind. Anything else I should know?"
+        ]
 
     def display(self, text="", rewrite=True):
         """ Updates the display bar with new text """

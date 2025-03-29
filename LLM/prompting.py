@@ -75,10 +75,10 @@ def response_generation(user_preferences):
 
     if user_preferences: # memory condition
         dialogue = get_dialogue_history(username, True)
-        prompt_file_path = Path(r"LLM/Prompts/response_generation.txt")
+        prompt_file_path = Path(r"LLM/Prompts/with_memory_response_generation.txt")
     else: # no memory condition
         dialogue = get_dialogue_history(username, False)
-        prompt_file_path = Path(r"LLM/Prompts/response_generation.txt") # TODO change the prompt
+        prompt_file_path = Path(r"LLM/Prompts/no_memory_response_generation.txt") # TODO change the prompt
 
     # print(dialogue)
     return prompt(prompt_file_path, username, dialogue, user_preferences)

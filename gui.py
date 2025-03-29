@@ -171,6 +171,7 @@ class AudioPlayerApp:
         elif self.state == 'ConditionChange':
             # Convert from ice-breaker to the first stage
             self.condition = self.config['custom']['memory_condition']
+            self.display(f"We are continuing with condition {self.condition} now.")
             self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  # TODO///M///

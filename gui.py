@@ -230,7 +230,7 @@ class AudioPlayerApp:
         else:
             self.condition = 2 if self.condition == 1 else 1
 
-            self.agent_response = "Session 1 ended. Before we start the next session, please fill in the questionnaire :)"
+            self.agent_response = "This is the end of Session 1. Before we start the next session, please fill in the questionnaire :)"
             self.display(self.agent_response)
             self.display_bar.update_idletasks() 
             text2speech(self.agent_response)

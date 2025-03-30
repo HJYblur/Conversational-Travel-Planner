@@ -17,11 +17,17 @@ def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_r
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
     user_text = f"User is {username}\n"
-    if user_preferences:
-        user_preferences = "User Preferences: " + ". ".join(user_preferences) + "\n"
+
     final_response = ""
-    if final_response_bool:
-        final_response = "This is your final travel recommendation to the user, wrap up accordingly."
+    if user_preferences: # response generation
+        user_preferences = "User Preferences: " + ". ".join(user_preferences) + "\n"
+        if final_response_bool:
+            final_response = "This is your final travel recommendation to the user, wrap up accordingly."
+        else:
+            prompt_text += "- Make sure you **finish by asking a question** to the user to keep the conversation going.\n"
+    else: # summarization
+        prompt_text += "\n"
+
     p = prompt_text + user_text + user_preferences + dialogue + final_response
     print(p)
 

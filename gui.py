@@ -73,9 +73,11 @@ class AudioPlayerApp:
         self.text = "OvO"
         self.irony = False
         self.summary = ""
-        self.ice_breaker = "TxT"
         self.agent_response = "Emma's response"
+        self.num_turns = 0 
+        self.max_turns = 3 # TODO: Set this to a desired value
         self.event_counter = 0
+        self.final_response = False
         self.icebreaker_question_counter = 0
         self.icebreaker_questions = [
             "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
@@ -157,8 +159,12 @@ class AudioPlayerApp:
             self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
+            # Keep track of number of turns
+            self.num_turns += 1
+            if self.num_turns == self.max_turns:
+                self.final_response = True
             # Step6: Communicate with LLM to generate the response
-            self.agent_response = response_generation(self.ice_breaker)
+            self.agent_response = response_generation(self.ice_breaker, self.final_response)
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  # TODO///M///
             self.state = 'Text2Speech'
@@ -167,10 +173,15 @@ class AudioPlayerApp:
             self.display(self.agent_response)  #TODO///M///
             self.display_bar.update_idletasks()  # TODO///M///
             text2speech(self.agent_response)
-            self.state = 'Idle'
+            # If final response, change condition
+            if self.final_response: # If yes, change condition
+                self.next_session()
+            else:
+                self.state = 'Idle'
         elif self.state == 'ConditionChange':
             # Convert from ice-breaker to the first stage
             self.condition = self.config['custom']['memory_condition']
+            self.num_turns = 0
             self.display(f"We are continuing with condition {self.condition} now.")
             self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
@@ -228,7 +239,9 @@ class AudioPlayerApp:
             self.condition = 2 if self.condition == 1 else 1
             self.display("Session 1 ended. Before we start the next session, please fill in the questionnaire :)")
             # TODO: add the transition sentence from session 1 to session 2
-            self.end_experiment = True
+            self.final_response = False # Clear for next round
+            self.num_turns = 0
+            self.end_experiment = True # Experiment will end following this round
             self.state = "Idle"
             self.update()
 

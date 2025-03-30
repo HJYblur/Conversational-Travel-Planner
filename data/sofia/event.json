@@ -1,1 +1,17 @@
-[]
+[
+    {
+        "id": "0",
+        "summarized_tuple": "Sofia prefers traveling in winter with her boyfriend.",
+        "irony": true
+    },
+    {
+        "id": "1",
+        "summarized_tuple": "Sofia prefers traveling with her boyfriend during winter months.",
+        "irony": false
+    },
+    {
+        "id": "2",
+        "summarized_tuple": "Sofia does not enjoy participating in ski trips.",
+        "irony": false
+    }
+]

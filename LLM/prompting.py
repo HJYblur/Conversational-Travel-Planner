@@ -14,7 +14,7 @@ data = {
 }
 
 
-def build_prompt(prompt_file_path, username, dialogue, user_preferences):
+def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
 
@@ -22,13 +22,17 @@ def build_prompt(prompt_file_path, username, dialogue, user_preferences):
 
     if user_preferences:
         user_preferences = "User Preferences: " + ", ".join(user_preferences)
+    
+    final_response = ""
+    if final_response_bool:
+        final_response = "\nThis is your final travel recommendation to the user, wrap up accordingly"
 
-    p = prompt_text + user_text + dialogue + user_preferences
-    #print(p)
+    p = prompt_text + user_text + dialogue + user_preferences + final_response
+    print(p)
     return p
 
-def prompt(prompt_file_path, username, dialogue, user_preferences):
-    data["prompt"] = build_prompt(prompt_file_path, username, dialogue, user_preferences)
+def prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
+    data["prompt"] = build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool)
 
     recommendation = ""
     response = requests.post(url, json=data, stream=True)
@@ -68,9 +72,9 @@ def summarization(question, user_answer):
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
     dialogue = get_last_utterances(question, user_answer)
     #print(dialogue)
-    return prompt(prompt_file_path, username, dialogue, "")
+    return prompt(prompt_file_path, username, dialogue, "", False)
 
-def response_generation(user_preferences):
+def response_generation(user_preferences, final_response_bool):
     username = load_config()['settings']['user']
 
     if user_preferences: # memory condition
@@ -81,6 +85,6 @@ def response_generation(user_preferences):
         prompt_file_path = Path(r"LLM/Prompts/no_memory_response_generation.txt") # TODO change the prompt
 
     # print(dialogue)
-    return prompt(prompt_file_path, username, dialogue, user_preferences)
+    return prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool)
 
 

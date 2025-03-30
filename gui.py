@@ -142,11 +142,16 @@ class AudioPlayerApp:
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
             self.ice_breaker = retrieve(self.summary, "ice_breaker") # memory_type = 'ice_breaker' or 'event'
+            print(f"In 'with memory' condition, the retrieved ice_breaker: {self.ice_breaker}")
+            
             self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Step6: Communicate with LLM to generate the response
-            self.agent_response = response_generation(self.ice_breaker)
+            if self.condition == 1:
+                self.agent_response = response_generation(self.ice_breaker)
+            else:
+                self.agent_response = response_generation()        
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  # TODO///M///
             self.state = 'Text2Speech'
@@ -159,7 +164,8 @@ class AudioPlayerApp:
         elif self.state == 'ConditionChange':
             # Convert from ice-breaker to the first stage
             self.condition = self.config['custom']['memory_condition']
-            self.display(f"We are continuing with condition {self.condition} now.")
+            print(f"We are continuing with condition {self.condition} now.")
+            
             self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  # TODO///M///
@@ -208,7 +214,7 @@ class AudioPlayerApp:
             
     def next_session(self):
         if self.condition == 0:
-            self.display("No responce during the ice-breaker session")
+            print("Icebreaker session cannot be terminated.")
             return
         
         if self.end_experiment:
@@ -218,7 +224,11 @@ class AudioPlayerApp:
         else:
             self.condition = 2 if self.condition == 1 else 1
             self.display("Session 1 ended. Before we start the next session, please fill in the questionnaire :)")
-            # TODO: add the transition sentence from session 1 to session 2
+            text2speech("Session 1 ended. Before we start the next session, please fill in the questionnaire :)")
+            
+            self.display("When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?")
+            text2speech("When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?")
+            
             self.end_experiment = True
             self.state = "Idle"
             self.update()

@@ -7,11 +7,10 @@ import wavio
 import numpy as np
 import threading
 from configure_loader import load_config
-from utils import append_to_json
+from utils import init_json, append_to_json
 from perception import percept, speech2text
 from information_retriever import retrieve
 from text_to_speech import text2speech
-from utils import init_json
 from LLM.prompting import response_generation, summarization
 
 class AudioPlayerApp:
@@ -72,25 +71,14 @@ class AudioPlayerApp:
         self.audio_data = []
         self.text = "OvO"
         self.irony = False
-        self.summary = ""
+        self.summary = "Summary"
+        self.ice_breaker = ""
         self.agent_response = "Emma's response"
         self.num_turns = 0 
         self.max_turns = 3 # TODO: Set this to a desired value
         self.event_counter = 0
         self.final_response = False
         self.icebreaker_question_counter = 0
-        self.icebreaker_questions = [
-            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
-            f"Nice to meet you, {self.config['settings']['user']}. Do you work, study, or a bit of both?",
-            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
-            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
-            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
-            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
-            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
-            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
-            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
-            "I'll keep that in mind. Anything else I should know?"
-        ]
 
         # Initialize State Machine
         self.state = "Start"
@@ -104,10 +92,10 @@ class AudioPlayerApp:
             self.start()
             self.state = "IceBreaker"
         elif self.state == "IceBreaker":
-            # self.display(self.icebreaker_questions[self.icebreaker_question_counter]) #TODO///before///
-            self.agent_response = self.icebreaker_questions[self.icebreaker_question_counter] #TODO///M///
-            self.display(self.agent_response) #TODO///M///
-            self.display_bar.update_idletasks()  # TODO///M///
+            # self.display(self.icebreaker_questions[self.icebreaker_question_counter]) #///before///
+            self.agent_response = self.icebreaker_questions[self.icebreaker_question_counter] 
+            self.display(self.agent_response)
+            self.display_bar.update_idletasks()  
             text2speech(self.icebreaker_questions[self.icebreaker_question_counter])
             self.state = "Idle"
         elif self.state == "Idle":
@@ -146,7 +134,6 @@ class AudioPlayerApp:
             self.display_bar.update_idletasks()
             question = self.agent_response
             self.summary = summarization(question, self.text)
-            # TODO: Clear the events file after condition changes between 1-2
             append_to_json(self.summary, self.event_counter, self.irony, "event.json")
             self.event_counter += 1
             if self.condition == 1: # with memory
@@ -156,36 +143,38 @@ class AudioPlayerApp:
         elif self.state == 'retrieval':
             # Step5: Information retrieval from long-term memory
             self.ice_breaker = retrieve(self.summary, "ice_breaker") # memory_type = 'ice_breaker' or 'event'
+            print(f"In 'with memory' condition, the retrieved ice_breaker: {self.ice_breaker}")
+            
             self.event = retrieve(self.summary, "event")
             self.state = 'GeneratingResponse'
         elif self.state == 'GeneratingResponse':
             # Keep track of number of turns
-            self.num_turns += 1
-            if self.num_turns == self.max_turns:
-                self.final_response = True
+            if self.condition != 0: 
+                self.num_turns += 1
+                if self.num_turns == self.max_turns:
+                    self.final_response = True
             # Step6: Communicate with LLM to generate the response
             self.agent_response = response_generation(self.ice_breaker, self.final_response)
             self.display(self.agent_response)
-            self.display_bar.update_idletasks()  # TODO///M///
+            self.display_bar.update_idletasks()  
             self.state = 'Text2Speech'
         elif self.state == 'Text2Speech':
             # Step7: Convert the LLM response to speech and output to users
-            self.display(self.agent_response)  #TODO///M///
-            self.display_bar.update_idletasks()  # TODO///M///
+            self.display(self.agent_response)  
+            self.display_bar.update_idletasks()  
             text2speech(self.agent_response)
+            self.state = 'Idle'
             # If final response, change condition
             if self.final_response: # If yes, change condition
                 self.next_session()
-            else:
-                self.state = 'Idle'
         elif self.state == 'ConditionChange':
             # Convert from ice-breaker to the first stage
-            self.condition = self.config['custom']['memory_condition']
-            self.num_turns = 0
-            self.display(f"We are continuing with condition {self.condition} now.")
+            self.condition = int(self.config['custom']['memory_condition'])
+            print(f"We are continuing with condition {self.condition} now.")
+
             self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
-            self.display_bar.update_idletasks()  # TODO///M///
+            self.display_bar.update_idletasks()  
             text2speech(self.agent_response)
             self.state = 'Idle'
         elif self.state == "Stopped":
@@ -202,13 +191,13 @@ class AudioPlayerApp:
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
 
-        user = simpledialog.askstring("User Initialization", "Please enter your name:")
+        self.user = simpledialog.askstring("User Initialization", "Please enter your name:")
 
-        if user:
+        if self.user:
             # Initialize the data directory in configuration
-            root_path = self.config['settings']['data_path']
-            user_path = os.path.join(root_path, user)
-            self.config["settings"]['user'] = user
+            root_path = './data'
+            user_path = os.path.join(root_path, self.user)
+            self.config["settings"]['user'] = self.user
             self.config['settings']['user_path'] = user_path
             with open('config.yaml', 'w') as config_file:
                 yaml.dump(self.config, config_file)
@@ -218,30 +207,46 @@ class AudioPlayerApp:
             init_json("ice_breaker.json")
             init_json("event.json") 
 
-            self.agent_response = f"Hello {user}, welcome to the travel recommendation agent!\n"
+            self.agent_response = f"Hello {self.user}, welcome to the travel recommendation agent!\n"
             self.display(self.agent_response)
-            self.display_bar.update_idletasks() #TODO///M///
+            self.display_bar.update_idletasks() 
             text2speech(self.agent_response)
+            
+            # Initialize the icebreaker questions
+            self.init_icebreaker()
         else:
             # If the user cancels the input dialog, close the application
             self.root.destroy()
             
     def next_session(self):
         if self.condition == 0:
-            self.display("No responce during the ice-breaker session")
+            print("Icebreaker session cannot be terminated.")
             return
         
         if self.end_experiment:
             self.display("Thank you for participating in the experiment! :)")
-            self.state == "Stopped"
+            self.state = "Stopped"
             self.update()
         else:
             self.condition = 2 if self.condition == 1 else 1
-            self.display("Session 1 ended. Before we start the next session, please fill in the questionnaire :)")
-            # TODO: add the transition sentence from session 1 to session 2
-            self.final_response = False # Clear for next round
+
+            self.agent_response = "Session 1 ended. Before we start the next session, please fill in the questionnaire :)"
+            self.display(self.agent_response)
+            self.display_bar.update_idletasks() 
+            text2speech(self.agent_response)
+            
+            self.agent_response = "When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
+            self.display(self.agent_response)
+            self.display_bar.update_idletasks() 
+            text2speech(self.agent_response)
+
+            # Clear event file
+            init_json("event.json") 
+
+            self.end_experiment = True
+            self.final_response = False
             self.num_turns = 0
-            self.end_experiment = True # Experiment will end following this round
+            self.ice_breaker = ""
             self.state = "Idle"
             self.update()
 
@@ -280,6 +285,20 @@ class AudioPlayerApp:
             self.start_button.config(state=tk.NORMAL)
             self.end_button.config(state=tk.DISABLED)
             # self.display(f"Recording saved to {audio_path}\n", True)
+            
+    def init_icebreaker(self):
+        self.icebreaker_questions = [
+            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
+            f"Nice to meet you, {self.user}. Do you work, study, or a bit of both?",
+            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
+            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
+            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
+            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
+            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
+            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
+            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
+            "I'll keep that in mind. Anything else I should know?"
+        ]
 
     def display(self, text="", rewrite=True):
         """ Updates the display bar with new text """

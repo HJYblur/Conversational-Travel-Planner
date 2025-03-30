@@ -1,14 +1,14 @@
 custom:
   memory_condition: '2'
 recording:
-  channels: 64
-  device_index: 7
-  samplerate: 44100
+  channels: 1
+  device_index: 0
+  samplerate: 24000
 settings:
   data_path: ./data
   device: cpu
-  icebreaker_question_count: 10
+  icebreaker_question_count: 1
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
-  user: sofia
-  user_path: ./data/sofia
+  user: cool
+  user_path: ./data/cool

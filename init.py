@@ -3,6 +3,7 @@ import tkinter as tk
 import sounddevice as sd
 import torch
 from gui import AudioPlayerApp
+from perception import *
 from configure_loader import load_config
 config = load_config()
     
@@ -39,3 +40,10 @@ def perception_init():
 
     with open('config.yaml', 'w') as config_file:
         yaml.dump(config, config_file)
+        
+    # Initialize the models
+    speech2text_model = init_speech2text_model(device=config["settings"]["device"])
+    whisper_model, whisper_feature_extractor, id2label = init_whisper_model()
+    emotion_predictor = init_librosa_model(config["settings"]["lstm_model_path"])
+    
+    print("Perception models initialized successfully.")

@@ -37,10 +37,3 @@ def text2speech(text):
         engine.say(sentence_part) 
         engine.runAndWait()
         time.sleep(0.5)  
-
-
-if __name__ == "__main__":
-    agent_text = "Hi, I am Alice. Today, I am here to help you plan your next great travel adventure. What is your name?"
-    # userID = "selin"
-    # turnID = 1
-    text2speech(agent_text)

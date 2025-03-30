@@ -151,7 +151,7 @@ class AudioPlayerApp:
             if self.condition == 1:
                 self.agent_response = response_generation(self.ice_breaker)
             else:
-                self.agent_response = response_generation()        
+                self.agent_response = response_generation(None)        
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  # TODO///M///
             self.state = 'Text2Speech'

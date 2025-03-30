@@ -207,7 +207,7 @@ class AudioPlayerApp:
             init_json("ice_breaker.json")
             init_json("event.json") 
 
-            self.agent_response = f"Hello {self.user}, welcome to the travel recommendation agent!\n"
+            self.agent_response = f"Hello {self.user}, I'm {self.CA_name}, your travel recommendation agent!\n"
             self.display(self.agent_response)
             self.display_bar.update_idletasks() 
             text2speech(self.agent_response)

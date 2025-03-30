@@ -16,11 +16,11 @@ data = {
 def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
-    user_text = f"User is {username}\n"
+    user_text = f"The user is {username}, address them directly.\n"
 
     final_response = ""
     if final_response_bool:
-        final_response = "This is your final travel recommendation to the user, wrap up accordingly."
+        final_response = "**Clearly state to the user** that this is your **final** travel recommendation and wrap up accordingly."
     else:
         prompt_text += "- Make sure you **finish by asking a question** to the user to keep the conversation going.\n"
 
@@ -48,6 +48,9 @@ def prompt(prompt_file_path, username, dialogue, user_preferences, final_respons
                 #print(output["response"], end="", flush=True)
     else:
         print(f"Error: {response.status_code}")
+
+    if final_response_bool:
+        recommendation = "Here is my final recommendation to you: " + recommendation
 
     return recommendation
 

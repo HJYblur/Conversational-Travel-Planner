@@ -7,7 +7,7 @@ recording:
 settings:
   data_path: ./data
   device: cpu
-  icebreaker_question_count: 1
+  icebreaker_question_count: 6
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
   user: cool

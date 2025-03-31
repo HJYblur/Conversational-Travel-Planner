@@ -288,16 +288,12 @@ class AudioPlayerApp:
             
     def init_icebreaker(self):
         self.icebreaker_questions = [
-            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
-            f"Nice to meet you, {self.user}. Do you work, study, or a bit of both?",
-            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
-            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
-            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
-            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
-            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
-            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
-            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
-            "I'll keep that in mind. Anything else I should know?"
+            f"Nice to meet you, {self.user}. Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you and do you work, study, or a bit of both?",
+            "That's great! I bet that keeps you busy. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
+            "That sounds like the perfect way to spend a trip! And speaking of trips - what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
+            "Nice! If you had to pick your favorite trip so far, which one stands out and what did you enjoy most about that trip?",
+            "That sounds amazing! What about your most recent trip?",
+            "Thank you for sharing! Anything else I should know? Otherwise, lets get started!",
         ]
 
     def display(self, text="", rewrite=True):
@@ -319,3 +315,18 @@ class AudioPlayerApp:
 
     def on_closing(self):
         self.root.destroy()
+
+
+def init_icebreaker(self):
+        self.icebreaker_questions = [
+            "Today, I am here to help you plan your next great travel adventure. But first, let's get to know each other a little! How old are you?",
+            f"Nice to meet you, {self.user}. Do you work, study, or a bit of both?",
+            "That's great! I bet that keeps you busy. When you do get some free time, how do you love to spend it? Any favorite hobbies?",
+            "That sounds like fun! I feel like people's hobbies often influence how they like to travel. When you're on vacation, what's your favorite way to spend your days? Are you more into sightseeing, adventure, relaxation, food, or something else?",
+            "That sounds like the perfect way to spend a trip! And speaking of trips - Who do you like to go with?",
+            "Nice! If you had to pick your top 3 favorite trips so far, which ones stand out?",
+            "Wow, these sound incredible! What did you enjoy most about each of those trips?",
+            "That sounds amazing! On the other hand, is there anything about traveling that you don't enjoy? Or something you don't like doing while traveling?",
+            "Got it! And what's your go-to mode of transportation when you travel? Planes, trains, road trips? Any you prefer to avoid?",
+            "I'll keep that in mind. Anything else I should know?"
+        ]

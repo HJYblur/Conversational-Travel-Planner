@@ -1,14 +1,14 @@
 custom:
-  memory_condition: '2'
+  memory_condition: '1'
 recording:
   channels: 1
-  device_index: 0
-  samplerate: 24000
+  device_index: 3
+  samplerate: 48000
 settings:
   data_path: ./data
   device: cpu
   icebreaker_question_count: 1
   k: 3
   lstm_model_path: ./models/cnn_lstm.keras
-  user: cool
-  user_path: ./data/cool
+  user: lemon
+  user_path: ./data/lemon

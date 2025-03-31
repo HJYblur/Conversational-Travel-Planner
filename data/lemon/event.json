@@ -1,7 +1,7 @@
 [
     {
-        "id": "0",
-        "summarized_tuple": "The user is a lemon who prefers warmer seasons and company from Rhett.",
-        "irony": true
+        "id": "1",
+        "summarized_tuple": "Lemon prefers not to discuss travel plans with others now.\n\nWould you like to share your travel preferences for April instead?",
+        "irony": false
     }
 ]

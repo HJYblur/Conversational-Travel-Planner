@@ -18,7 +18,7 @@ class AudioPlayerApp:
         self.root = root
         self.root.title("Conversational Travel Planner")
         self.config = load_config()
-        self.CA_name = "Emma"
+        self.CA_name = "TAP"
         self.center_window()
         self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
         # self.session_counter = 0 # 1: session 1, 2: session 2
@@ -225,20 +225,15 @@ class AudioPlayerApp:
         
         if self.end_experiment:
             self.display("Thank you for participating in the experiment! :)")
-            self.state = "Stopped"
-            self.update()
+            # self.state = "Stopped"
+            # self.update()
         else:
             self.condition = 2 if self.condition == 1 else 1
 
-            self.agent_response = "This is the end of Session 1. Before we start the next session, please fill in the questionnaire :)"
-            self.display(self.agent_response)
+            transition_message = "This is the end of Session 1. \n Before we start the next session, please fill in the questionnaire :)\n When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
+            self.display(transition_message)
             self.display_bar.update_idletasks() 
-            text2speech(self.agent_response)
-            
-            self.agent_response = "When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
-            self.display(self.agent_response)
-            self.display_bar.update_idletasks() 
-            text2speech(self.agent_response)
+            text2speech(transition_message)
 
             # Clear event file
             init_json("event.json") 

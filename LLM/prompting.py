@@ -22,7 +22,8 @@ def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_r
     if final_response_bool:
         final_response = "**Clearly state to the user** that this is your **final** travel recommendation and wrap up accordingly."
     else:
-        prompt_text += "- Make sure you **finish by asking a question** to the user to keep the conversation going.\n"
+        if user_preferences: # do not run when summary
+            prompt_text += "- Make sure you **finish by asking a question** to the user to keep the conversation going.\n"
 
     if user_preferences: # response generation
         user_preferences = "User Preferences: " + ". ".join(user_preferences) + "\n"

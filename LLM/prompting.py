@@ -16,7 +16,7 @@ data = {
 def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
-    user_text = f"The user is {username}, address them directly.\n"
+    user_text = f"The user is {username}, address them in first person.\n E.g. {username} I would recommend ...\n"
 
     final_response = ""
     if final_response_bool:

@@ -18,7 +18,7 @@ class AudioPlayerApp:
         self.root = root
         self.root.title("Conversational Travel Planner")
         self.config = load_config()
-        self.CA_name = "Emma"
+        self.CA_name = "TAP"
         self.center_window()
         self.condition = 0 # 0: ice_breaker, 1: with memory, 2: without memory
         # self.session_counter = 0 # 1: session 1, 2: session 2
@@ -172,7 +172,7 @@ class AudioPlayerApp:
             self.condition = int(self.config['custom']['memory_condition'])
             print(f"We are continuing with condition {self.condition} now.")
 
-            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
+            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip.\n Let's start with session 1. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  
             text2speech(self.agent_response)
@@ -207,7 +207,7 @@ class AudioPlayerApp:
             init_json("ice_breaker.json")
             init_json("event.json") 
 
-            self.agent_response = f"Hello {self.user}, welcome to the travel recommendation agent!\n"
+            self.agent_response = f"Hello {self.user}, I'm {self.CA_name}, your travel recommendation agent!\n"
             self.display(self.agent_response)
             self.display_bar.update_idletasks() 
             text2speech(self.agent_response)
@@ -225,20 +225,16 @@ class AudioPlayerApp:
         
         if self.end_experiment:
             self.display("Thank you for participating in the experiment! :)")
-            self.state = "Stopped"
-            self.update()
+            text2speech("Thank you for participating in the experiment!")
+            # self.state = "Stopped"
+            # self.update()
         else:
             self.condition = 2 if self.condition == 1 else 1
 
-            self.agent_response = "Session 1 ended. Before we start the next session, please fill in the questionnaire :)"
-            self.display(self.agent_response)
+            transition_message = "This is the end of Session 1. \n Before we start the next session, please fill in the questionnaire :)\n When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
+            self.display(transition_message)
             self.display_bar.update_idletasks() 
-            text2speech(self.agent_response)
-            
-            self.agent_response = "When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
-            self.display(self.agent_response)
-            self.display_bar.update_idletasks() 
-            text2speech(self.agent_response)
+            text2speech(transition_message)
 
             # Clear event file
             init_json("event.json") 

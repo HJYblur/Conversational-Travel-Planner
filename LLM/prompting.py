@@ -13,7 +13,7 @@ data = {
 }
 
 
-def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
+def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool, summarization_bool):
     with open(prompt_file_path, "r") as file:
         prompt_text = file.read()
     user_text = f"The user is {username}, address them in first person.\n E.g. {username} I would recommend ...\n"
@@ -22,7 +22,7 @@ def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_r
     if final_response_bool:
         final_response = "**Clearly state to the user** that this is your **final** travel recommendation and wrap up accordingly."
     else:
-        if user_preferences: # do not run when summary
+        if not summarization_bool: # response generation
             prompt_text += "- Make sure you **finish by asking a question** to the user to keep the conversation going.\n"
 
     if user_preferences: # response generation
@@ -36,8 +36,8 @@ def build_prompt(prompt_file_path, username, dialogue, user_preferences, final_r
     return p
 
 
-def prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool):
-    data["prompt"] = build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool)
+def prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool, summarization_bool):
+    data["prompt"] = build_prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool, summarization_bool)
     recommendation = ""
     response = requests.post(url, json=data, stream=True)
     if response.status_code == 200:
@@ -87,7 +87,7 @@ def summarization(question, user_answer):
     prompt_file_path = Path(r"LLM/Prompts/summarization.txt")
     dialogue = get_last_utterances(question, user_answer)
 
-    return prompt(prompt_file_path, username, dialogue, "", False)
+    return prompt(prompt_file_path, username, dialogue, "", False, True)
 
 
 def response_generation(user_preferences, final_response_bool):
@@ -100,6 +100,6 @@ def response_generation(user_preferences, final_response_bool):
         prompt_file_path = Path(r"LLM/Prompts/no_memory_response_generation.txt")
     # print(dialogue)
 
-    return prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool)
+    return prompt(prompt_file_path, username, dialogue, user_preferences, final_response_bool, False)
 
 

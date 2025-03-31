@@ -232,6 +232,7 @@ class AudioPlayerApp:
             self.condition = 2 if self.condition == 1 else 1
 
             transition_message = "This is the end of Session 1. \n Before we start the next session, please fill in the questionnaire :)\n When you are ready, please click the 'Start Talking' button to begin the next session and tell me during which season do you prefer to travel and with whom?"
+            self.agent_response = transition_message
             self.display(transition_message)
             self.display_bar.update_idletasks() 
             text2speech(transition_message)

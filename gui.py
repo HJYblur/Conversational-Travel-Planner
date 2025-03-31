@@ -172,7 +172,7 @@ class AudioPlayerApp:
             self.condition = int(self.config['custom']['memory_condition'])
             print(f"We are continuing with condition {self.condition} now.")
 
-            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip. First off, during which season do you prefer to travel and with whom?"
+            self.agent_response = "Now that I got to know you more, I want to help you plan your next trip.\n Let's start with session 1. First off, during which season do you prefer to travel and with whom?"
             self.display(self.agent_response)
             self.display_bar.update_idletasks()  
             text2speech(self.agent_response)
@@ -225,6 +225,7 @@ class AudioPlayerApp:
         
         if self.end_experiment:
             self.display("Thank you for participating in the experiment! :)")
+            text2speech("Thank you for participating in the experiment!")
             # self.state = "Stopped"
             # self.update()
         else:

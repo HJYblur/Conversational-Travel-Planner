@@ -1,0 +1,17 @@
+[
+    {
+        "id": "3",
+        "summarized_tuple": "Anna prefers traveling in winter with her parents.",
+        "irony": false
+    },
+    {
+        "id": "4",
+        "summarized_tuple": "Anna prefers winter travel in Europe over California/Nevada.",
+        "irony": false
+    },
+    {
+        "id": "5",
+        "summarized_tuple": "Anna prefers activities beyond skiing.",
+        "irony": false
+    }
+]

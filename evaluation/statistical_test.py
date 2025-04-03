@@ -1,4 +1,4 @@
-from scipy.stats import ttest_rel
+from scipy.stats import ttest_rel, wilcoxon
 
 # Data condition 1
 condition_1_factor_2 = [
@@ -22,7 +22,7 @@ condition_2_factor_5 = [
     3, 5, 4, 4, 5, 3, 3, 3, 4, 4, 4, 4, 3, 4, 2, 4, 5, 2, 2, 4, 3, 3, 3, 4, 3, 3, 5, 4, 4, 2
 ]
 
-# Paired one-tailed t-test
+# One-tailed paired t-test
 print("Factor 2:")
 t_stat, p_value = ttest_rel(condition_1_factor_2, condition_2_factor_2, alternative='greater')
 print("t_stat:", t_stat)
@@ -33,3 +33,10 @@ print("Factor 3:")
 t_stat, p_value = ttest_rel(condition_1_factor_3, condition_2_factor_3, alternative='greater')
 print("t_stat:", t_stat)
 print("p_value:", p_value)
+print()
+
+# One-tailed Wilcoxon signed-rank test
+print("Factor 5:")
+res = wilcoxon(condition_1_factor_5, condition_2_factor_5, alternative='greater')
+print("stat:", res.statistic)
+print("p-value:", res.pvalue)

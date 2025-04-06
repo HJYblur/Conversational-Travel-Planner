@@ -1,34 +1,36 @@
-# Conversational-Travel-Planner
+# Travel-Agent-Planner(TAP) 🌍💬
 
-## Usage
+## Usage 🚀
 
-1. Install the dependencies using 
+1. **Install all the dependencies** using:  
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-    `pip install -r requirements.txt`
+2. **Install PyAudio (for Linux)** 🎙️:  
+    ```bash
+    sudo apt update
+    sudo apt install portaudio19-dev python3-pyaudio
+    pip install pyaudio
+    ```
 
-2. Install pyaudio (for Linux)
-`sudo apt update`
-`sudo apt install portaudio19-dev python3-pyaudio`
-`pip install pyaudio`
+3. **Install Ollama** 🛠️:  
+    Download it from [Ollama's website](https://ollama.com/download) and ensure it is running in the background.
 
-3. Install ollama (https://ollama.com/download) and have it running in the background
+4. **Download the LLM Llama 3.2** 🦙:  
+    Use the following command to download it from [Ollama's library](https://ollama.com/library/llama3.2):  
+    ```bash
+    ollama run llama3.2
+    ```
 
-4. Download the LLM llama 3.2 (https://ollama.com/library/llama3.2) with the command 
-   
-   `ollama run llama3.2`
+5. **Run the main Python file**:  
+    ```bash
+    python main.py
+    ```
 
-5. Run the main python file using 
+6. **Initial Setup** ⚙️:  
+    - The system will print **"Enter condition"**, where you can type `1` or `2` to experience the difference.  
+    - Our agent will also ask for your name—please enter it using the keyboard.
 
-    `python main.py`
-
-6. Before we start, the system will print "Hello, welcome to the travel recommendation agent!" and ask for your name. For now, please type `sofia` since we only have the test data.
-
-7. The first trial could be quite slow, as the models will be automatically downloaded. But after that every round should be quite quick.
-    1. The input query now is hard-coded as "'I want to go to the beach'", but feel free to try different idea.
-    2. Now we have the retrieved information and output, you should be able to check in the console, as exampled in the image below.
-
-    ![example output!](asset/example.png)
-
-## Information Retrieval
-
-TODO
+7. **Start the Conversation**:  
+    Now, feel free to chat with our agent and enjoy the experience! 😊

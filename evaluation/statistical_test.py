@@ -37,6 +37,6 @@ print()
 
 # One-tailed Wilcoxon signed-rank test
 print("Factor 5:")
-res = wilcoxon(condition_1_factor_5, condition_2_factor_5, alternative='greater')
+res = wilcoxon(condition_1_factor_5, condition_2_factor_5, alternative='less')
 print("stat:", res.statistic)
 print("p-value:", res.pvalue)
